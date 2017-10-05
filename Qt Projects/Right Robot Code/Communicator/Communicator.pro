@@ -13,13 +13,13 @@ SOURCES += main.cpp \
     communicate.c \
     communicator.cpp \
     locate.cpp \
-    driver.cpp
+    driver.cpp \ talk.cpp
 
 HEADERS += \
     communicate.h \
     communicator.h \ args.h \
     locate.h \
-    driver.h
+    driver.h \ talk.h
 
 linux-g++* {
     CONFIG += link_pkgconfig
