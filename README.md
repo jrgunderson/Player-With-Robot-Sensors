@@ -3,8 +3,8 @@
 
 PREFACE:
 
-If you don't have a Linux Partition || need some general Linux troubleshooting tips:
-	Read "How to Dual Boot"
+If you don't have a Linux Partition |or| need some general Linux troubleshooting tips:
+	- Read "How to Dual Boot" inside "Notes" folder
 
 ___________________________________________________________________________________________________
 	
