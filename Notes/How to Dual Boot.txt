@@ -1,0 +1,82 @@
+DUAL BOOT
+
+w/ Rufus:
+- https://www.youtube.com/watch?v=DcHt6OGrIJA
+	Before Install:
+	- Rufus (portable) -> ISO image -> Ubuntu LTS
+	- fragment
+	- disk management -> shrink volume (120 GB = 122,880 MB)
+	To Install:
+	- 'Settings' -> 'Update & Security' -> 'Recovery' -> Advanced Startup: 'Restart Now'
+		     -> 'Use a Device' -> 'EFI USB Device'
+	- 'Install Ubuntu'
+	- 'something else'
+		- SSD: (no need for a *swap partition)
+	- 'free space' -> '+' -> Use as: -> Ext4 journaling file system -> mount point: -> "/" -> 'ok'
+		- 'primary' if less than or equal to 4 partition, 'logical' if partitioning an extended partition 
+	- device for boot loader installation -> '/dev/sda'
+
+*setup swap partition (during installation of ubuntu - about size of current RAM - 2GB = 2048MB)
+	- 'free space' -> '+' -> mount point: -> "swap area" -> 'ok'
+	- https://www.youtube.com/watch?v=hOz66FC0pWU
+
+- To partition Linux (mainly used for Over Provisioning):
+	- boot from USB -> "Try Ubuntu" -> GParted
+
+- To load Windows 1st at initial start-up:
+	- download "grub customizer"
+_______________________________________________________________________________________________________
+Helpful Programs:
+
+-Enable "open terminal here":
+ 	- "sudo apt-get install nautilus-open-terminal"
+	- reboot
+
+- Download Software:
+	- open terminal -> 'sudo apt-get update'
+
+	- 'Ubuntu Software Center' (basic installations of a few programs) 
+			or 
+	- 'Synaptic Package Manager' (full versions of many programs)
+	
+- To extend battery life:
+	- download "TLP"
+		sudo add-apt-repository ppa:linrunner/tlp
+		sudo apt-get update
+		sudo apt-get install tlp tlp-rdw
+		sudo tlp start
+
+_______________________________________________________________________________________________________
+Troubleshooting:
+
+-If receiving error when trying to access OS:
+	- Search -> Disks -> edit mount options -> click on gear -> edit mount options -> 
+	add ,remove_hiberfile
+* BUT SLOWS DOWN SHUT DOWN AND START UP *
+
+
+-To retrieve Linux files from Windows partition:
+	- download "DiskInternals Linux Reader"
+
+
+- May need to UNLOCK administartion directory
+	- open terminal -> 'sudo rm /var/lib/dpkg/lock'
+
+- Fix Slow Shut Down:
+	- open terminal -> 'sudo systemctl stop cups-browsed.service'
+			-> 'sudo systemctl disable cups-browsed.service'
+
+
+- Fix Clock (only for Ubuntu 16.04):
+	- regedit -> HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation -> 
+	Right click anywhere in the right pane and hit New > DWORD (32-bit) Value -> 
+	Name it RealTimeIsUniversal -> double click on it and give it a value of 1
+
+- fix slow start up (only for Ubuntu 16.04):
+	- dowload "boot repair"
+
+- Save brightness settings:
+	http://ubuntuhandbook.org/index.php/2014/04/save-screen-brightness-settings-in-ubuntu-14-04/
+
+
+

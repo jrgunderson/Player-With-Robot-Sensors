@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall   -shared -Wl,-soname,libplayerjpeg.so.3.1 -o libplayerjpeg.so.3.1.0-svn CMakeFiles/playerjpeg.dir/playerjpeg.o -ljpeg -Wl,-rpath,/usr/local/lib 

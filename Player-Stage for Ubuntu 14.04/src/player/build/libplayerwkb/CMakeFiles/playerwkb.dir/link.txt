@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC  -Wall   -shared -Wl,-soname,libplayerwkb.so.3.1 -o libplayerwkb.so.3.1.0-svn CMakeFiles/playerwkb.dir/playerwkb.o ../libplayercommon/libplayercommon.so.3.1.0-svn -Wl,-rpath,/usr/local/lib 

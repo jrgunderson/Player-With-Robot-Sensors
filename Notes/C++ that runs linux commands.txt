@@ -1,0 +1,29 @@
+
+// will open a new terminal window that runs command "playerv --ranger:0"
+// necessary if you want to run c++ program simultaniously as terminal commands
+// "sh -c" = execute command from shell
+
+system("gnome-terminal -x sh -c 'cd /home/jrgunderson/Downloads/player/examples/libplayerc++ ; playerv --ranger:0'");
+
+
+// runs "playerv --ranger:0" without opening a new terminal window
+
+system("cd /home/jrgunderson/Downloads/player/examples/libplayerc++ ; playerv --ranger:0");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

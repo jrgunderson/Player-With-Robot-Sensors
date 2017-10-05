@@ -1,0 +1,379 @@
+
+/*
+ * Read-Think-Act loop 1: - move away from walls and move towards a box until certain dist
+ * 
+ * Read-Think-Act loop 2: turn towards center
+ *
+ * Read-Think-Act loop 3: move towards center
+ * 
+ * Read-Think-Act loop 4: turn until front of roomba facing front-center of box
+ */
+
+#include <libplayerc++/playerc++.h>
+#include <iostream>
+#include <cmath>
+
+#include "args.h"
+
+#define RAYS 32
+
+double speed = .3;  // in meters per second	
+double minDist = .17;
+double minRadius = .5;
+double adjacent = -1;  // for calculating turn rate in RTA loop 3
+
+
+PlayerCc::PlayerClient robot(gHostname, gPort);
+PlayerCc::Position2dProxy pp(&robot, gIndex);
+PlayerCc::LaserProxy lp(&robot, gIndex);
+PlayerCc::RangerProxy rp(&robot, gIndex);
+
+
+// functions
+int getSizeLeft(int index);
+int getSizeRight(int index);
+int getSizeStraight(int index);
+int getMiddleIndex(int index);
+
+int main(int argc, char **argv)
+{
+  parse_args(argc,argv);
+
+  // we throw exceptions on creation if we fail
+  try
+  {
+	std::cout << robot << std::endl;
+
+	pp.SetMotorEnable (true);
+
+	robot.Read();
+
+	// read parameters
+	int scanPoints = lp.GetCount();
+	int thirtyDegrees = scanPoints/8;
+	int fortyFiveDegrees = scanPoints/5.3;
+	int right = thirtyDegrees; // -90 degrees from center
+	int left = scanPoints-1 - thirtyDegrees; // 90 degrees from center
+	int straight = scanPoints/2;
+	double maxRange = lp.GetMaxRange();
+	// size that is definitely not a box
+	int minWallSize = 200;
+	
+	int leftEye = straight + thirtyDegrees;
+	int rightEye = straight - thirtyDegrees;
+
+	std::cout << rightEye << " -> " << leftEye << std::endl;
+
+	double newturnrate = 0; // in radians per seconds
+
+	// initialize variables
+	int index = -1;
+	int boxSize = scanPoints;
+	bool isWall = true;
+	
+	double theta = -1; // for calculating turn rate in RTA loop 3
+	bool isLeft = false;
+
+	// go into read-think-act loop 1 
+    	for(;;)
+    	{
+		robot.Read();
+
+		// keep initializing to max distance
+		double minObjDist = maxRange;
+
+		// locate corner of nearest obstacle (presumably a box) 
+		for (int i=rightEye; i<leftEye; ++i)
+		{
+			double pointDistance = lp[i];
+			// search for shortest datapoint
+			// >.02 cuz sometimes range returns weirdly low numbers for no reason
+			if( pointDistance > .02 && pointDistance < minObjDist )
+			{
+				minObjDist = pointDistance;
+				index = i;
+			}
+		}
+
+		adjacent = index;
+		std::cout << "\nindex " << index << std::endl;
+
+
+		// get size of box
+		if( index > (straight+5) ) // if left of center
+		{
+			boxSize = getSizeLeft(index);
+
+		}	
+		else if( index < (straight-5) ) // if right of center
+		{
+			boxSize = getSizeRight(index);
+		}
+		else{
+			boxSize = getSizeStraight(index);
+		}
+
+		std::cout << "box size: " << boxSize << std::endl;
+
+		// turn the robot until front facing box
+		// turn rate increases as it gets closer to object
+		// if box between middle 10 datapoints
+		// do not change turnrate from initialized value of 0
+		if( index > (straight+5) ) // if left of center
+		{
+			newturnrate = 1/(8*minObjDist); // turn left 
+
+		}	
+		else if( index < (straight-5) ) // if right of center
+		{
+			newturnrate = -1/(8*minObjDist); // turn right
+		}
+
+
+		std::cout << "Box at DataPoint: " << index 
+				<< ", Distance: "<< minObjDist << std::endl;
+
+		std::cout << "speed: " << speed
+				  << " turn: " << newturnrate
+				  << std::endl;
+
+		std::cout << "isWall? " << isWall << std::endl;
+
+
+		// turn away from wall 
+		if( boxSize > minWallSize )
+		{
+			isWall = true;
+			newturnrate = -newturnrate;
+		}
+		else{
+			isWall = false;
+		}
+
+
+		// write commands to robot
+		pp.SetSpeed(speed, newturnrate);
+
+
+		// stop scanning once finite object a reached certain distance
+		if( minObjDist <= minRadius && !isWall )
+		{
+			std::cout << "I FOUND A BOX!" << std::endl;
+			break;
+		}
+	
+    	} // end think-read-react loop 1
+
+
+	// get size of box && calculate middle index just off of center, 
+	// so when roomba turns to face center of box, it doesn't under-shoot center.
+	if( index > (straight+5) ) // if left of center
+	{
+		boxSize = getSizeLeft(index);
+		std::cout << "Left size: " << boxSize << std::endl;
+		index = (boxSize/2) + index + 10;
+		isLeft = true;
+
+	}	
+	else if( index < (straight-5) ) // if right of center
+	{
+		boxSize = getSizeRight(index);
+		std::cout << "Right size: " << boxSize << std::endl;
+		index = index - (boxSize/2) - 10;
+	}
+	else{
+		boxSize = getSizeStraight(index);
+		std::cout << "Middle size: " << boxSize << std::endl;
+		index = getMiddleIndex(index);
+	}
+
+	double middleDist = lp[index];
+
+	// calculate theta for loop 4
+	theta = asin(adjacent/middleDist);
+	if(isLeft)
+	{
+		theta = -theta;
+	}
+	std::cout << "\nisLeft" << isLeft << std::endl;
+	std::cout << "Adj: " << adjacent << ", Hyp: " << middleDist << std::endl;
+	std::cout << "Theta: " << theta << std::endl;
+	std::cout << "middle at distance: " << middleDist << std::endl;
+		
+	// go into read-think-act loop 2 (turn towards center of box)
+	for(;;)
+	{
+		robot.Read();
+
+		std::cout << "\nStraight distance: " << lp[straight] << std::endl;
+
+		// turn the robot until front facing box
+		if( lp[straight] > 0.01 && lp[straight] == middleDist ) // index is at center
+		{
+			std::cout << "FOUND CENTER OF BOX" << std::endl;
+			break;
+		}
+		if( isLeft ) // if left of center
+		{
+			newturnrate = .1; // turn left
+
+		}	
+		else // if right of center
+		{
+			newturnrate = -.1; // turn right
+		}
+
+		std::cout << " turn: " << newturnrate  << std::endl;
+
+		// write commands to robot
+		pp.SetSpeed(0, newturnrate);
+
+
+	}// end read-think-act 2
+
+	
+	// go into read-think-act loop 3 (move to center of box)
+	for(;;)
+	{
+		robot.Read();
+	
+		double boxDist = lp[straight];
+		if(lp[straight] <= 0.01){ boxDist = 999;}
+	
+		std::cout << "\nBox Distance " << boxDist << std::endl;
+
+		std::cout << "speed: " << speed  << std::endl;
+	
+		if( boxDist <= minDist )
+		{
+			std::cout << "REACHED BOX AT CENTER" << std::endl;
+			break;
+		}
+
+		// write commands to robot
+		pp.SetSpeed(.25, 0);
+	
+	}// end read-think-act 3
+
+	
+	for(int i=0; i<2; ++i)
+	{
+		robot.Read();
+		std::cout << "Theta: " << theta << std::endl;
+		pp.SetSpeed(0, theta);
+	}
+
+
+
+  } // end try 
+  catch (PlayerCc::PlayerError & e)
+  {
+    std::cerr << e << std::endl;
+    return -1;
+  }
+	
+} // end main
+
+
+// returns size of box if index is to the left of the robot's center
+int getSizeLeft(int index)
+{
+	for( int i = index; i<681; ++i )
+	{
+		if( lp[i+1] <= 0.01 ){ continue; }
+		
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i+1] - lp[i]) > .5 )
+		{
+			return i+1 - index; // size = total length in dataPoints
+		}
+	}
+
+	// if reached this point, then continuous
+	return 999;
+}	
+
+// returns size of box if index is to the right of the robot's center
+int getSizeRight(int index)
+{
+	for( int i = index; i>0; --i )
+	{
+		if( lp[i-1] <= 0.01 ){ continue; }
+
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i-1] - lp[i]) > .5 )
+		{
+			return index - i-1; // size = total length in dataPoints
+		}
+	}
+
+	// if reached this point, then continuous
+	return 999;
+}
+
+// returns middle index for box directly in front of sensor
+int getMiddleIndex(int index)
+{
+	int endIndex = -1;
+	int startIndex = -1;
+	for( int i = index; i<681; ++i )
+	{
+		if( lp[i+1] <= 0.01 ){ continue; }
+
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i+1] - lp[i]) > .5  )
+		{
+			endIndex = i+1;
+			break;
+		}
+	}
+	for( int i = index; i>0; --i )
+	{
+		if( lp[i-1] <= 0.01 ){ continue; }
+
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i-1] - lp[i]) > .5 )
+		{
+			startIndex = i-1;
+			break;
+		}
+	}
+
+	int size = endIndex - startIndex;
+	std::cout << "Middle size: " << size << std::endl;
+
+	return (size/2) + startIndex;
+}
+
+// returns size of box if directly in front of laser sensor
+int getSizeStraight( int index)
+{
+	int endIndex = -1;
+	int startIndex = -1;
+	for( int i = index; i<681; ++i )
+	{
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i+1] - lp[i]) > .5 )
+		{
+			endIndex = i+1;
+			break;
+		}
+	}
+	for( int i = index; i>0; --i )
+	{
+		// box ends once no longer incrementally increasing consecutive distances
+		if( std::abs(lp[i-1] - lp[i]) > .5 )
+		{
+			startIndex = i-1;
+			break;
+		}
+	}
+
+	return endIndex - startIndex;
+}
+
+
+
+
+
+

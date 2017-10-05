@@ -1,0 +1,44 @@
+driver
+(
+	name "roomba"
+	provides ["position2d:0"]
+	port "/dev/ttyUSB0"
+        safe 0
+
+)
+
+driver
+(
+	name "hokuyoaist"
+	provides ["ranger:0"]
+)
+
+driver
+(
+	name "rangertolaser"
+	requires ["ranger:0"]
+	provides ["laser:0"]
+)
+
+driver
+(
+  name "camerauvc"
+  provides ["camera:0"]
+  #port "/dev/video0"
+  #size [640 480]
+)
+driver
+(
+  name "cmvision"
+  provides ["blobfinder:0"]
+  requires ["camera:0"]
+  colorfile "colors.txt"
+)
+driver
+(
+  name "cameracompress"
+  provides ["camera:1"]
+  requires ["camera:0"]
+  image_quality 0.3
+)
+

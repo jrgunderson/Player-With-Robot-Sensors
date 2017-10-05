@@ -1,0 +1,42 @@
+(1) you need to create the Ad-Hoc using ubuntu itself. It should be a quick google search on that end. 
+
+	- System Settings -> Network -> "Use as HotSpot..."
+	(note that your wireless card cannot act as a HotSpot while simultanously being connected to the internet -> a simple solution is to get a USB Wireless adapter)  
+
+
+(2) the ports (8888/7777) were used as I was doing testing on the same computer. The ip address used is the address of the computer that we want to send the information to. As the user interface program is ran on the host of the ad hoc it will end in a xxx.1 (thus robot control will send to xxx.1), the ip address for robot control is dynamic so that will need to be changed. Thus the user interface will use xxx.yyy where y is the last digits of the ip address for the computer running the robot control code. 
+
+// In UserInterface 
+ 
+	nw = new NetworkWrapper(8888);
+	// IP address of laptop running RobotControl
+	robotList.append(new Robot("10.42.0.75", 7777));
+
+
+// In RobotControl
+ 
+        nw = new NetworkWrapper(7777);
+	// Local Host IP address, port player listening on
+        controller = new robotController("127.0.0.1",6665,map);
+	// IP address of computer running UserInterface
+        controller->setController("10.42.0.1", 8888);
+
+
+
+(3) Difference in run modes
+
+The debug mode was not quite well named. There is a debug run in qt, but there is also a variable called debug in the code. This variable is a toggle that enables/disables the code that runs on player. The variable is declared in multiple files if I recall. 
+
+
+I didn't use profile, but I think it just checks to see how well the code runs. Release mode just generates an executable that you are not able to break on. So when running in release mode you are unable to stop at set breakpoints or get more information if there is an exception.
+
+
+(4) Playerv does "grab" the data as it is showing the current readings from the sensor. To "grab" the laser data programmatically, you will need to access the laser output via a reference in the program. This would be done via a ranger. I believe that there is some code already present in the program that grabs the laser reference. You could access the reference and then print out the values. The values would be in an array, although I do not know off the top of my head what the value would represent. Most likely distance, but I do not remember in what units.
+
+
+(5) For testing wise, try changing the catch method in the core constructor (in the robot controller), to catch the exception and rethrow/print out the exception. As it stands it is just throwing -1 resulting in the 255 error when running. Printing out the error or rethrowing would give a bit more information about the run time exception. If you cannot find the core constructor it is the method that is visible in the robotcontrol connection info.png. 
+
+
+
+
+

@@ -1,0 +1,13 @@
+driver
+(
+#  name "p2os_position"
+  name "p20s"
+  provides ["position2d:0"]
+)
+
+driver
+(
+  name "sicklms200"
+  provides ["laser:0"]
+  port "/dev/ttyS0"
+)

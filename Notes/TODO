@@ -1,0 +1,37 @@
+
+// TODO //
+
+--------------------------------------------
+Communication between robots
+--------------------------------------------
+
+Use C++ library 'Pthread' for multi-threading
+
+// first function
+for(;;)
+{
+	//listen for message
+}
+
+
+--------------------------------------------
+need to grab camera data
+--------------------------------------------
+
+"blobposition" or "blobtracker"
+http://playerstage.sourceforge.net/doc/Player-cvs/player/group__driver__Blobposition.html
+or
+http://playerstage.sourceforge.net/doc/Player-cvs/player/group__driver__Blobtracker.html
+
+blobfinderproxy.cc or test_blobfinder.cc or bigbob10.cc  
+
+playerv can also visualize blobfinder data
+
+
+--------------------------------------------
+other
+--------------------------------------------
+
+Run explicit communication ->  UserInterface on mobile device // Does it need player?
+
+
