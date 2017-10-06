@@ -12,7 +12,7 @@ ________________________________________________________________________________
 
 /// To get Player/Stage working on your Ubuntu 14.04 ///
 
-	- Simply download the "src" folder inside the folder "Player-Stage for Ubuntu 14.04"
+	- Simply download the "src" folder inside the folder "Player-Stage for Ubuntu 14.04" into your home directory
 
 	- Run the 2 .sh script files inside the src folder
 		- $ sudo ./<filename>.sh
