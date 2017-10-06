@@ -8,10 +8,14 @@ using namespace std;
 
 Driver *d;
 
-// passing into thread
+// function to be executed by thread
 void PrintHello(void *threadid)
 {
-   cout << "Hello World! Thread ID, " << threadid << endl;
+    // since incoming argument must be void type
+    // cast back to non-void type
+    int info = (int)threadid;
+
+   cout << "Hello World! Thread ID, " << info << endl;
 
    // close thread
    pthread_exit(NULL);
@@ -23,7 +27,7 @@ int main(int argc, char *argv[])
     pthread_t threads[1];
 
     // info to be passed
-    string info = "YAY!";
+    int info = 1;
 
     // paraemters = (which thread, NULL=default, function thread is executing, pointer variable (NULL=no arguments))
     pthread_create(&threads, NULL, PrintHello, (void *)info);
