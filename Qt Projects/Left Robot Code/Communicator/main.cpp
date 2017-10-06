@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     int info = 1;
 
     // paraemters = (which thread, NULL=default, function thread is executing, pointer variable (NULL=no arguments))
-    pthread_create(&threads, NULL, PrintHello, (void *)info);
+    pthread_create(&threads[1], NULL, PrintHello, (void *)info);
 
 
     Locate();
