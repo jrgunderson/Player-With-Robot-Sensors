@@ -185,13 +185,11 @@ error while loading shared libraries: <filename>: cannot open shared object file
 - copy file to usr/local/lib
 	sudo cp <filename> /usr/local/lib
 
-
 ------------------------------------------------------------------------
 Qt: if no kits
 ------------------------------------------------------------------------
 
 sudo apt-get install qt5-default
-
 
 
 
