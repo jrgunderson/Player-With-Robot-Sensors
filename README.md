@@ -26,7 +26,7 @@ ________________________________________________________________________________
 
 /// SETUP HOKUYOAIST & PHIDGET SENSORS ///
 
-	- Follow instructions on first 2 pages of "DesignOverviewDocument" inside "Player-Stage for Ubuntu 14.04" folder
+	- Follow instructions on first 2 pages of "DesignOverviewDocument" inside "Player for Ubuntu 14.04" folder
 
 	- If you run into any problems, please reference "Troubleshoot Install"
 
