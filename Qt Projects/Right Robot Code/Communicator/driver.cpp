@@ -1,24 +1,26 @@
 #include "driver.h"
-#include <QThread>
-#include <QDebug>
 
+pthread_t thread;
 Communicator* com;
-QThread receiveThread;
 
-Driver::Driver(QObject *parent)
-    : QObject(parent)
+Driver::Driver()
 {
-    char ip1[] = "192.168.0.14"; //Robot 1 or Other Robot
-    char ip2[] = "192.168.0.14"; //Robot 2 or Phone
-    char ip3[] = "192.168.0.14"; //Desktop
+    char ip1[] = "10.110.255.74"; //Robot 1 or Other Robot
+    char ip2[] = "10.110.255.74"; //Robot 2 or Phone
+    char ip3[] = "10.110.255.74"; //Desktop
+
+    // open thread
+    thread = pthread_self();
+    if (thread == 0)
+    {
+        cout << "ERROR: Problem Creating Thread" << endl;
+    }
+    else{
+        cout << "Thread Created..." << endl;
+    }
+
 
     com = new Communicator(ip1,ip2,ip3, 6665);
-    com->moveToThread(&receiveThread);
-    receiveThread.start();
-
-    connect(&receiveThread,SIGNAL(started()),
-            com,SLOT(startListen()));
-    qDebug() << receiveThread.isRunning();
     com->send_Ready();
     sleep(10);
     com->send_Task();

@@ -1,17 +1,18 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
-#include <QAbstractItemModel>
-#include "communicator.h"
 
-class Driver : public QObject
+#include <iostream>
+#include <pthread.h>
+#include <communicator.h>
+
+using namespace std;
+
+
+class Driver
 {
-    Q_OBJECT
-
-public:
-    explicit Driver(QObject *parent = 0);
-
-private:
+    public:
+        explicit Driver();
 };
 
 #endif // DRIVER_H
