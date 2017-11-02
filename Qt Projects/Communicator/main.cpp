@@ -1,3 +1,4 @@
+/* Pseudo-Hub */
 
 //#include "locate.h"
 #include "driver.h"
@@ -8,8 +9,12 @@ Driver *d;
 int main(int argc, char *argv[])
 {
 
-    d = new Driver(1);
+    d = new Driver();
 
+    for(;;){
+        d->Command1();
+        sleep(2);
+    }
 
     //Locate();
 

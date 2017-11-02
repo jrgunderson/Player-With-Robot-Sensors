@@ -94,7 +94,6 @@ int create_send(char *host, int portnum, int index)
     }
 
     // non-blocking?
-#include <time.h>
     //fcntl(fd, F_SETFL, O_NONBLOCK);
 
     send_addr[index].sin_family = AF_INET;

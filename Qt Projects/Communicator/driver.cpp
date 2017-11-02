@@ -1,58 +1,78 @@
+/* I apologize in advance for what seems to be so many redundant Methods
+ * But it was proving impossible to pass Communicator objects through threads
+ * So each Method deals with a specific thread */
+
 #include "driver.h"
 
-char ip1[] = "10.42.0.99";
-char ip2[] = "10.42.0.99";
-char ip3[] = "10.42.0.42"; // other robot
-thread* listen_thread;
-thread* talk_thread;
-Communicator* lcom;
-Communicator* tcom;
+char ip[] = "10.42.0.99";
+char r2ip[] = "10.42.0.11";
+char r1ip[] = "10.42.0.42"; // other robot
+thread* r1lt;
+thread* r1st;
+thread* r2lt;
+thread* r2st;
+Communicator* r1com;
+Communicator* r2com;
+int r1port = 4950;
+int r2port = 4951;
 
 // default constructor: for Robot
 Driver::Driver()
 {
-      lcom = new Communicator(ip1,ip2,ip3, 4950);
-      listen_thread = new std::thread(&Driver::Listen, this);
-      sleep(1); // a quick delay to space out threads
+      r1com = new Communicator(ip,ip,r1ip, r1port);
+      r2com = new Communicator(ip,ip,r2ip, r2port);
 
-      tcom = new Communicator(ip1,ip2,ip3, 4951);
-      talk_thread = new std::thread(&Driver::Error, this);
+      r1lt= new std::thread(&Driver::Listen1, this);
+      r2lt= new std::thread(&Driver::Listen2, this);
+
+      r1st= new std::thread(&Driver::Speak1, this);
+      r2st= new std::thread(&Driver::Speak2, this);
 }
 
 
-// constructor for Hub
-Driver::Driver(int i)
+// Start Listening to Robot1
+void Driver::Listen1( )
 {
-    lcom = new Communicator(ip1,ip2,ip3, 4950);
-    listen_thread = new std::thread(&Driver::Listen, this);
-    sleep(1); // a quick delay to space out threads
-
-    tcom = new Communicator(ip1,ip2,ip3, 4951);
-    //tlcom = new Communicator(ip1,ip2,ip3, 4952);
-    talk_thread = new std::thread(&Driver::Command, this);
+    r1com->startListen();
 }
 
-// For anyone
-void Driver::Listen()
+// Start Listening to Robot1
+void Driver::Listen2( )
 {
-    lcom->startListen();
+    r2com->startListen();
 }
 
-// For Robot
-void Driver::Speak()
+// Send Ready to Robot1
+void Driver::Speak1()
 {
-    tcom->send_Ready();
+    r1com->send_Ready();
 }
 
-// For Robot
-void Driver::Error()
+// Send Ready to Robot2
+void Driver::Speak2()
 {
-    tcom->send_Error("Error");
+    r2com->send_Ready();
+}
+
+// Send Error to Robot1
+void Driver::Error1()
+{
+    r1com->send_Error("Error");
+}
+
+// Send Error to Robot2
+void Driver::Error2()
+{
+    r2com->send_Error("Error");
 }
 
 // For Hub
-void Driver::Command()
+void Driver::Command1()
 {
-    tcom->send_Move(0, "Move Right"); // send Robot 1 Right
-   // tlcom->send_Move(1, "Move Left"); // send Robot 2 Left
+    r1com->send_Move(0, "Move Right"); // send Robot 1 Right
+}
+
+void Driver::Command2()
+{
+    r2com->send_Move(1, "Move Left"); // send Robot 2 Left
 }
