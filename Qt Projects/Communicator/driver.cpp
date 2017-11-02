@@ -5,28 +5,22 @@
 #include "driver.h"
 
 char ip[] = "10.42.0.99";
-char r2ip[] = "10.42.0.11";
 char r1ip[] = "10.42.0.42"; // other robot
-thread* r1lt;
-thread* r1st;
-thread* r2lt;
-thread* r2st;
+char r2ip[] = "10.42.0.11";
 Communicator* r1com;
 Communicator* r2com;
-int r1port = 4950;
-int r2port = 4951;
 
 // default constructor: for Robot
 Driver::Driver()
 {
-      r1com = new Communicator(ip,ip,r1ip, r1port);
-      r2com = new Communicator(ip,ip,r2ip, r2port);
+      r1com = new Communicator(ip,ip,r1ip, 4950);
+      r2com = new Communicator(ip,ip,r2ip, 4951);
 
-      r1lt= new std::thread(&Driver::Listen1, this);
-      r2lt= new std::thread(&Driver::Listen2, this);
+      thread* r1lt= new std::thread(&Driver::Listen1, this);
+      thread* r2lt= new std::thread(&Driver::Listen2, this);
 
-      r1st= new std::thread(&Driver::Speak1, this);
-      r2st= new std::thread(&Driver::Speak2, this);
+      thread* r1st= new std::thread(&Driver::Speak1, this);
+      thread* r2st= new std::thread(&Driver::Speak2, this);
 }
 
 

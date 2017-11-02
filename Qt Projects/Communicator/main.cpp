@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 
     for(;;){
         d->Command1();
+        d->Command2();
         sleep(2);
     }
 
