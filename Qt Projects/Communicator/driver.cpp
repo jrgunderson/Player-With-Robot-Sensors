@@ -1,21 +1,23 @@
 #include "driver.h"
 
-char ip1[] = "10.110.253.62"; //Robot 1 or Other Robot
-char ip2[] = "10.110.253.62"; //Robot 2 or Phone
-char ip3[] = "10.110.253.62"; //Desktop
-int port = 4950; // needs to be the same
+char ip1[] = "10.42.0.99";
+char ip2[] = "10.42.0.99";
+char ip3[] = "10.42.0.42"; // Robot1
 thread* listen_thread;
 thread* talk_thread;
-Communicator* com;
+Communicator* lcom;
+Communicator* tcom;
+Communicator* tlcom;
+Communicator* trcom;
 
 // default constructor: for Robot
 Driver::Driver()
 {
-      com = new Communicator(ip1,ip2,ip3, port);
-
+      lcom = new Communicator(ip1,ip2,ip3, 4950);
       listen_thread = new std::thread(&Driver::Listen, this);
       sleep(1); // a quick delay to space out threads
 
+      tcom = new Communicator(ip1,ip2,ip3, 4951);
       talk_thread = new std::thread(&Driver::Speak, this);
 }
 
@@ -23,35 +25,36 @@ Driver::Driver()
 // constructor for Hub
 Driver::Driver(int i)
 {
-    com = new Communicator(ip1,ip2,ip3, port);
-
+    lcom = new Communicator(ip1,ip2,ip3, 4950);
     listen_thread = new std::thread(&Driver::Listen, this);
     sleep(1); // a quick delay to space out threads
 
+    trcom = new Communicator(ip1,ip2,ip3, 4951);
+    tlcom = new Communicator(ip1,ip2,ip3, 4952);
     talk_thread = new std::thread(&Driver::Command, this);
 }
 
 // For anyone
 void Driver::Listen()
 {
-    com->startListen();
+    lcom->startListen();
 }
 
 // For Robot
 void Driver::Speak()
 {
-    com->send_Ready();
+    tcom->send_Ready();
 }
 
 // For Robot
 void Driver::Error()
 {
-    com->send_Error("Error");
+    tcom->send_Error("Error");
 }
 
 // For Hub
 void Driver::Command()
 {
-    com->send_Move(0, "Move Right"); // send Robot 1 Right
-    com->send_Move(1, "Move Left"); // send Robot 2 Left
+    trcom->send_Move(0, "Move Right"); // send Robot 1 Right
+    tlcom->send_Move(1, "Move Left"); // send Robot 2 Left
 }
