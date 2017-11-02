@@ -72,20 +72,10 @@ void Communicator::send_Ready(){
 
     // create a message
     char *msg = NULL;
-    //char *char_from = NULL;
-    //char *char_x = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
-    //char_from = (char *) malloc(10*sizeof(char));
-    //char_x = (char *) malloc(10*sizeof(char));
-
-    //itoa((int)port, char_from);
-    //itoa((int)x, char_x);
 
     strcpy(msg, "R");
-    //strcat(msg, char_from);
-    //strcat(msg, "$");
-    //strcat(msg, char_x);
     strcat(msg, "!");
     send_cmd(sfd2,msg);
 }
@@ -94,20 +84,10 @@ void Communicator::send_Ready(){
 void Communicator::send_Task(){
     // create a message
     char *msg = NULL;
-    //char *char_from = NULL;
-    //char *char_x = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
-    //char_from = (char *) malloc(10*sizeof(char));
-    //char_x = (char *) malloc(10*sizeof(char));
-
-    //itoa((int)port, char_from);
-    //itoa((int)x, char_x);
 
     strcpy(msg, "T");
-    //strcat(msg, char_from);
-    //strcat(msg, "$");
-    //strcat(msg, char_x);
     strcat(msg, "!");
 
     send_cmd(sfd1,msg);
@@ -118,20 +98,10 @@ void Communicator::send_Task(){
 void Communicator::send_Start(){
     // create a message
     char *msg = NULL;
-    //char *char_from = NULL;
-    //char *char_x = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
-    //char_from = (char *) malloc(10*sizeof(char));
-    //char_x = (char *) malloc(10*sizeof(char));
-
-    //itoa((int)port, char_from);
-    //itoa((int)x, char_x);
 
     strcpy(msg, "S");
-    //strcat(msg, char_from);
-    //strcat(msg, "$");
-    //strcat(msg, char_x);
     strcat(msg, "!");
 
     send_cmd(sfd1, msg);
@@ -142,8 +112,6 @@ void Communicator::send_Start(){
 void Communicator::send_Error(char *emsg){
     // create a message
     char *msg = NULL;
-    //char *char_from = NULL;
-    //char *char_x = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
 
@@ -163,18 +131,14 @@ void Communicator::send_Move(int i, int m){
 
     // create a message
     char *msg = NULL;
-    //char *char_from = NULL;
     char *char_m = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
-    //char_from = (char *) malloc(10*sizeof(char));
-    //char_x = (char *) malloc(10*sizeof(char));
 
-    //itoa((int)port, char_from);
     itoa((int)m, char_m);
 
     strcpy(msg, "M");
-    //strcat(msg, char_from);
+
     strcat(msg, "$");
     strcat(msg, char_m);
     strcat(msg, "!");
@@ -187,16 +151,15 @@ void Communicator::send_Move(int i, int m){
     }
 }
 
+// send command
 void Communicator::send_cmd(int sfd, char *msg){
     int nbytes = 0;
 
     printf("sending message: %s\n", msg);
     nbytes = talk_to_one(sfd, msg, H);
-    //qDebug() << "Number of Bytes ";
-    //qDebug() << nbytes;
 }
 
-
+// parses receiving messages into its corresponding types
 void Communicator::parse_msg(char *msg){
     char *ptr, *token;
 
@@ -247,13 +210,17 @@ void Communicator::parse_msg(char *msg){
         }
     }
 }
+
+// continuously listens for messages
 void Communicator::startListen(){
     int nbytes = 0;
     char msg[MAXBUF];
 
     lfd = create_listen(port,H);
+
     while (1) {
         nbytes = listen_to_robot(lfd, msg);
+
         if (nbytes == 0) continue;
         printf("I received message: %s\n", msg);
         parse_msg(msg);
@@ -261,11 +228,3 @@ void Communicator::startListen(){
     }
 }
 
-/*      ptr = strstr(token, "C");
-      ptr++;
-      printf(ptr);
-      printf("port number %d\n", atoi(ptr));
-      ptr = strstr(token, "$");
-      ptr++;
-      printf("x position is %d\n", atoi(ptr));
-      token = strtok(NULL, "!");*/

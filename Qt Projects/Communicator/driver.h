@@ -13,8 +13,11 @@ class Driver
 {
     public:
         explicit Driver();
+        explicit Driver(int i);
         void Listen();
         void Speak();
+        void Error();
+        void Command();
 };
 
 #endif // DRIVER_H

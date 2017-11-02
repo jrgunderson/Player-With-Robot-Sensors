@@ -12,13 +12,13 @@ TEMPLATE = app
 SOURCES += main.cpp \
     communicate.c \
     communicator.cpp \
-    locate.cpp \
+#    locate.cpp \
     driver.cpp
 
 HEADERS += \
     communicate.h \
     communicator.h \ args.h \
-    locate.h \
+#    locate.h \
     driver.h
 
 linux-g++* {
