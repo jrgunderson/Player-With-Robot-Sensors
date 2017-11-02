@@ -106,6 +106,7 @@ void Communicator::send_Start(){
 
     send_cmd(sfd1, msg);
     send_cmd(sfd2, msg);
+
 }
 
 //For All
@@ -120,28 +121,31 @@ void Communicator::send_Error(char *emsg){
     strcat(msg, emsg);
     strcat(msg, "!");
 
-    send_cmd(sfd1,"E");
-    send_cmd(sfd2,"E");
-    send_cmd(sfd3,"E");
+    strcpy(msg, "E");
+    strcat(msg, "!");
+
+    send_cmd(sfd1, msg);
+    send_cmd(sfd2, msg);
+    send_cmd(sfd3, msg);
 }
 
 //From Phone or Desktop to Either Robot
 //C will be F, B, L, or R
-void Communicator::send_Move(int i, int m){
+void Communicator::send_Move(int i, char *msg){
 
-    // create a message
-    char *msg = NULL;
-    char *char_m = NULL;
+//    // create a message
+//    char *msg = NULL;
+//    char *char_m = NULL;
 
-    msg = (char *) malloc(60*sizeof(char));
+//    msg = (char *) malloc(60*sizeof(char));
 
-    itoa((int)m, char_m);
+//    itoa((int)m, char_m);
 
-    strcpy(msg, "M");
+//    strcpy(msg, "M");
 
-    strcat(msg, "$");
-    strcat(msg, char_m);
-    strcat(msg, "!");
+//    strcat(msg, "$");
+//    strcat(msg, char_m);
+//    strcat(msg, "!");
 
     if(i == 0){ //Robot 1
         send_cmd(sfd1,msg);
@@ -198,15 +202,17 @@ void Communicator::parse_msg(char *msg){
             printf("This is a E type of message\n");
             ptr = strstr(token, "$");
             ptr++;
+            token = NULL;
             emit(errorReceived(ptr));
         }
         else if ((token[0] == 'M')) {
             printf("This is a M type of message\n");
             ptr = strstr(token, "$");
             ptr++;
-            int m = atoi(ptr);
+            //int m = atoi(ptr);
             token = NULL;
-            emit(moveReceived(m));
+            //emit(moveReceived(m));
+            emit(errorReceived(ptr));
         }
     }
 }

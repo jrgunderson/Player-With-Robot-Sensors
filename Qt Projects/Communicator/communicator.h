@@ -8,7 +8,10 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <math.h>
+#include <iostream>
 #include <QDebug>
+
+using namespace std;
 
 class Communicator : public QObject
 {
@@ -23,7 +26,7 @@ public:
     void send_Task();
     void send_Start();
     void send_Error(char *emsg);
-    void send_Move(int i, int m);
+    void send_Move(int i, char *m);
     int port;
 
 private:
