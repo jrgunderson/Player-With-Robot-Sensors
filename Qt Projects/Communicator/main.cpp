@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
     d = new Driver();
 
     for(;;){
-        d->Command1();
-        d->Command2();
+        d->Speak();
         sleep(2);
     }
 
