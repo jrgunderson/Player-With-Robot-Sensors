@@ -2,13 +2,11 @@
 
 char ip1[] = "10.42.0.99";
 char ip2[] = "10.42.0.99";
-char ip3[] = "10.42.0.42"; // Robot1
+char ip3[] = "10.42.0.42"; // other robot
 thread* listen_thread;
 thread* talk_thread;
 Communicator* lcom;
 Communicator* tcom;
-Communicator* tlcom;
-Communicator* trcom;
 
 // default constructor: for Robot
 Driver::Driver()
@@ -18,7 +16,7 @@ Driver::Driver()
       sleep(1); // a quick delay to space out threads
 
       tcom = new Communicator(ip1,ip2,ip3, 4951);
-      talk_thread = new std::thread(&Driver::Speak, this);
+      talk_thread = new std::thread(&Driver::Error, this);
 }
 
 
@@ -29,8 +27,8 @@ Driver::Driver(int i)
     listen_thread = new std::thread(&Driver::Listen, this);
     sleep(1); // a quick delay to space out threads
 
-    trcom = new Communicator(ip1,ip2,ip3, 4951);
-    tlcom = new Communicator(ip1,ip2,ip3, 4952);
+    tcom = new Communicator(ip1,ip2,ip3, 4951);
+    //tlcom = new Communicator(ip1,ip2,ip3, 4952);
     talk_thread = new std::thread(&Driver::Command, this);
 }
 
@@ -55,6 +53,6 @@ void Driver::Error()
 // For Hub
 void Driver::Command()
 {
-    trcom->send_Move(0, "Move Right"); // send Robot 1 Right
-    tlcom->send_Move(1, "Move Left"); // send Robot 2 Left
+    tcom->send_Move(0, "Move Right"); // send Robot 1 Right
+   // tlcom->send_Move(1, "Move Left"); // send Robot 2 Left
 }
