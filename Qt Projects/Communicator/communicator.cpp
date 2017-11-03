@@ -13,6 +13,8 @@ int sfd1; //Robot
 int sfd2; //Other Robot or Phone
 int sfd3; //Desktop
 
+bool isReady;
+
 int lfd;
 
 extern "C"{
@@ -78,6 +80,11 @@ void Communicator::send_Ready(){
     strcpy(msg, "R");
     strcat(msg, "!");
     send_cmd(sfd2,msg);
+}
+
+bool Communicator::getReady()
+{
+    return isReady;
 }
 
 //For Desktop
@@ -185,6 +192,7 @@ void Communicator::parse_msg(char *msg){
         }
         else if ((token[0] == 'R')) {
             printf("This is a R type of message\n");
+            isReady = true;
             token = NULL;
             emit(startReceived());
         }
@@ -219,12 +227,14 @@ void Communicator::parse_msg(char *msg){
 
 // continuously listens for messages
 void Communicator::startListen(){
+
     int nbytes = 0;
     char msg[MAXBUF];
 
     lfd = create_listen(port,H);
 
     while (1) {
+        isReady = false;
         nbytes = listen_to_robot(lfd, msg);
 
         if (nbytes == 0) continue;

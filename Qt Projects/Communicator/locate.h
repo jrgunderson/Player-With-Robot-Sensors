@@ -20,6 +20,7 @@ public:
     int leftEye = -1;
 
     Locate();
+    void run();
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
     int getBoxSize(int index);

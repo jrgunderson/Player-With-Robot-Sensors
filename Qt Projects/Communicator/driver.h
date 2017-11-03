@@ -17,6 +17,7 @@ class Driver
         void Speak();
         void Error();
         void Command();
+        bool isReady();
 };
 
 #endif // DRIVER_H

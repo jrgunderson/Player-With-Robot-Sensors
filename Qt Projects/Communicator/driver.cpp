@@ -2,7 +2,7 @@
 
 char ip1[] = "10.42.0.99";
 char ip2[] = "10.42.0.99";
-char ip3[] = "10.42.0.42"; // other robot
+char ip3[] = "10.42.0.11"; // other robot
 
 Communicator* com;
 
@@ -42,3 +42,10 @@ void Driver::Command()
     com->send_Move(0, "Move Right"); // send Robot 1 Right
    // tlcom->send_Move(1, "Move Left"); // send Robot 2 Left
 }
+
+bool Driver::isReady()
+{
+    return com->getReady();
+}
+
+

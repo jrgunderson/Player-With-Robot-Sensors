@@ -11,6 +11,7 @@
 #include "locate.h"
 #include "args.h"
 #include <ctime>
+#include "driver.h"
 
 
 PlayerCc::PlayerClient robot(gHostname, gPort);
@@ -18,10 +19,17 @@ PlayerCc::Position2dProxy pp(&robot, gIndex);
 PlayerCc::LaserProxy lp(&robot, gIndex);
 PlayerCc::RangerProxy rp(&robot, gIndex);
 time_t timer;
+Driver* d;
 
-Locate::Locate()
+
+Locate::Locate(){
+
+}
+
+void Locate::run()
 {
     timer = time(0);
+    d = new Driver();
 
     std::cout << robot << std::endl;
 
@@ -125,6 +133,18 @@ void Locate::pushLeft(int n)
 
     // wait for input to start pushing
     //waitForInput();
+
+    // wait for ready message from other robot to push
+    for(;;){
+
+        if(d->isReady())
+        {
+            break;
+        }
+        else{
+            wait(1);
+        }
+    }
 
     // magnitude of the box perpendicular
     double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));

@@ -13,9 +13,12 @@ int main(int argc, char *argv[])
     for(;;){
         d->Speak();
         sleep(2);
+
+        cout << d->isReady() << endl;
     }
 
-    //Locate();
+    //Locate* l = new Locate();
+    //l->run();
 
 
 }
