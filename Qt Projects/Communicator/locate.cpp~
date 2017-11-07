@@ -29,12 +29,11 @@ Locate::Locate(){
 void Locate::run()
 {
     timer = time(0);
+    d = new Driver();
 
     std::cout << robot << std::endl;
 
-    sleep(3);
-
-    d = new Driver();
+    sleep(8);
 
     // throw exceptions on creation if fail
     try{
@@ -184,9 +183,7 @@ void Locate::pushRight(int n)
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
     // wait for input to start pushing
-    //waitForInput();
-
-	d->Ready();
+    waitForInput();
 
     // get current distance to neighboring roomba
     double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
