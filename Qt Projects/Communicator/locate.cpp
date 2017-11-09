@@ -32,7 +32,7 @@ void Locate::run()
 
     std::cout << robot << std::endl;
 
-    sleep(3);
+    //sleep(5);
 
     d = new Driver();
 
@@ -95,8 +95,8 @@ void Locate::run()
         // finally we can start pushing the box
         //pushBox(3); // for pushing the box by itself
 
-        //pushRight(50);
-        pushLeft(200);  // hard coded the timing for cooperative pushing
+        //pushLeft(50);
+        pushRight(50);  // number of iterations to push
 
 
 
@@ -128,24 +128,15 @@ void Locate::run()
 void Locate::pushLeft(int n)
 {
     goToLeftSide();
-    wait(1);
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
     // wait for input to start pushing
     //waitForInput();
 
-    // wait for ready message from other robot to push
-    for(;;){
-
-        if(d->isReady())
-        {
-            break;
-        }
-        else{
-            wait(1);
-        }
-    }
+    // send that you're ready to push!
+    d->Speak();
+    wait(.5); // wait for other robot to react real quick
 
     // magnitude of the box perpendicular
     double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
@@ -179,14 +170,23 @@ void Locate::pushLeft(int n)
 void Locate::pushRight(int n)
 {
     goToRightSide();
-    wait(1); // should be bound to wait for least amount of time possible
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
     // wait for input to start pushing
     //waitForInput();
 
-	d->Ready();
+    // wait for ready message from other robot to push
+    for(;;){
+
+        if(d->isReady())
+        {
+            break;
+        }
+        else{
+            wait(1);
+        }
+    }
 
     // get current distance to neighboring roomba
     double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
