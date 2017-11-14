@@ -95,8 +95,8 @@ void Locate::run()
         // finally we can start pushing the box
         //pushBox(3); // for pushing the box by itself
 
-        //pushLeft(50);
-        pushRight(50);  // number of iterations to push
+        pushLeft(50);
+        //pushRight(50);  // number of iterations to push
 
 
 
@@ -151,8 +151,7 @@ void Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
-            //wait4Ready();
-            wait(5); // wait 5 seconds, then start pushing box on its own
+            wait4Ready();
             pushBox(3);
             break;
         }
@@ -182,9 +181,11 @@ void Locate::pushRight(int n)
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
-        // introduce error 1/4 into pushing
-        if(i >= n/4){
+        // introduce error 1/2 into pushing
+        if(i >= n/2){
             introduceError();
+            d->Speak();
+            break;
         }
     }
 }
@@ -193,16 +194,17 @@ void Locate::pushRight(int n)
 // 1) send error, 2) get out of way, 3) turn off motor
 void Locate::introduceError()
 {
-    d->Error("Malfunction");
-    wait(1);
+    d->Error();
+    wait(5);
 
     // go backwards
-    for(int i=0; i<20; ++i)
+    for(int i=0; i<30; ++i)
     {
         robot.Read();
         pp.SetSpeed(-cap, 0.0);
     }
 
+    wait(1);
     clear();
 
 }

@@ -47,7 +47,7 @@ public:
     void wait4Ready();
     void introduceError();
     double sumOfMagnitudes(int start, int end);
-    void cleare();
+    void clear();
 
 private:
 
