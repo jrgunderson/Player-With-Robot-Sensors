@@ -108,9 +108,14 @@ void Locate::run()
 
 
     std::cout << "THE END " << std::endl;
+    clear();
+
+}
 
 
-    // clear system
+// clear system
+void Locate::clear()
+{
     for(int i=0; i<10; ++i)
     {
         robot.Read();
@@ -118,7 +123,6 @@ void Locate::run()
         //robot.Stop();
         pp.SetMotorEnable(false);
     }
-
 }
 
 
@@ -130,9 +134,6 @@ void Locate::pushLeft(int n)
     goToLeftSide();
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
-
-    // wait for input to start pushing
-    //waitForInput();
 
     // send that you're ready to push!
     d->Speak();
@@ -147,18 +148,15 @@ void Locate::pushLeft(int n)
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
-//        // if other robot pushes its side too far
-//        double newBoxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
-//        std::cout << "Old Mag: " << boxMag << ", New Mag: " << newBoxMag << std::endl;
+        // if other robot malfunctions
+        if(d->isError())
+        {
+            //wait4Ready();
+            wait(5); // wait 5 seconds, then start pushing box on its own
+            pushBox(3);
+            break;
+        }
 
-//        if( std::abs(boxMag - newBoxMag) > 1 )
-//        {
-//            std::cout << " Error Detected! " << std::endl;
-//            wait(1);
-//            waitForInput();
-//        }
-
-//        boxMag = newBoxMag;
     }
 
 }
@@ -166,27 +164,14 @@ void Locate::pushLeft(int n)
 
 
 // n = number of rounds to push for
-
 void Locate::pushRight(int n)
 {
     goToRightSide();
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
-    // wait for input to start pushing
-    //waitForInput();
-
     // wait for ready message from other robot to push
-    for(;;){
-
-        if(d->isReady())
-        {
-            break;
-        }
-        else{
-            wait(1);
-        }
-    }
+    wait4Ready();
 
     // get current distance to neighboring roomba
     double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
@@ -197,36 +182,29 @@ void Locate::pushRight(int n)
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
-//        // if other robot pushes its side too far
-//        double newBoxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
-//        std::cout << "Old Mag: " << boxMag << ", New Mag: " << newBoxMag << std::endl;
-
-//        if( std::abs(boxMag - newBoxMag) > 1 )
-//        {
-//            std::cout << " Error Detected! " << std::endl;
-//            wait(1);
-//            waitForInput();
-//        }
-
-//        boxMag = newBoxMag;
+        // introduce error 1/4 into pushing
+        if(i >= n/4){
+            introduceError();
+        }
     }
 }
 
 
-void Locate::waitForInput()
+// 1) send error, 2) get out of way, 3) turn off motor
+void Locate::introduceError()
 {
-    char input;
-    while( input != 'y')
-    {
-        std::cout << "Should i start pushing?" << std::endl;
+    d->Error("Malfunction");
+    wait(1);
 
-        // prevents from crashing if wrong input type
-        if( !(std::cin >> input) )
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+    // go backwards
+    for(int i=0; i<20; ++i)
+    {
+        robot.Read();
+        pp.SetSpeed(-cap, 0.0);
     }
+
+    clear();
+
 }
 
 
@@ -240,6 +218,21 @@ void Locate::wait(int n )
     }
 }
 
+
+// wait for ready message from other robot to push
+void Locate::wait4Ready()
+{
+    for(;;){
+
+        if(d->isReady())
+        {
+            break;
+        }
+        else{
+            wait(1);
+        }
+    }
+}
 
 
 // n =  number of times to go back and forth

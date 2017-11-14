@@ -18,6 +18,7 @@ class Driver
         void Error();
         void Command();
         bool isReady();
+        bool isError();
 };
 
 #endif // DRIVER_H

@@ -14,6 +14,7 @@ int sfd2; //Other Robot or Phone
 int sfd3; //Desktop
 
 bool isReady;
+bool isError;
 
 int lfd;
 
@@ -86,6 +87,12 @@ bool Communicator::getReady()
 {
     return isReady;
 }
+
+bool Communicator::getError()
+{
+    return isError;
+}
+
 
 //For Desktop
 void Communicator::send_Task(){
@@ -207,6 +214,7 @@ void Communicator::parse_msg(char *msg){
             emit(startReceived());
         }
         else if ((token[0] == 'E')) {
+            isError = true;
             printf("This is a E type of message\n");
             ptr = strstr(token, "$");
             ptr++;
@@ -235,6 +243,7 @@ void Communicator::startListen(){
 
     while (1) {
         isReady = false;
+        isError = false;
         nbytes = listen_to_robot(lfd, msg);
 
         if (nbytes == 0) continue;

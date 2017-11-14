@@ -44,8 +44,10 @@ public:
     void pushRight(int n);
     void pushLeft(int n);
     void wait(int n);
-    void waitForInput();
+    void wait4Ready();
+    void introduceError();
     double sumOfMagnitudes(int start, int end);
+    void cleare();
 
 private:
 

@@ -28,6 +28,7 @@ public:
     void send_Error(char *emsg);
     void send_Move(int i, char *m);
     bool getReady();
+    bool getError();
     int port;
 
 private:

@@ -48,4 +48,11 @@ bool Driver::isReady()
     return com->getReady();
 }
 
+bool Driver::isError()
+{
+    return com->getError();
+}
+
+
+
 
