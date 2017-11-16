@@ -14,11 +14,13 @@ class Driver
     public:
         explicit Driver();
         void Listen();
-        void Speak();
+        void SendReady();
+        void SendHelp();
         void Error();
         void Command();
         bool isReady();
         bool isError();
+        bool needHelp();
 };
 
 #endif // DRIVER_H

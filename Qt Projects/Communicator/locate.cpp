@@ -4,37 +4,44 @@
  *
  * Task 2: - adjust until front facing box
  *
- * Task 3: - push box by alternating between corners
+ * Task 3: - move to respective corner of box
+ *      a) Robot1 goes to Left side first
+ *      b) Robot2 then goes to Right side
+ *
+ * Task 4: - push
+ *      a) if Robot1 stops
+ *      b) Robot2 will also stop
  *
  */
 
-#include "locate.h"
 #include "args.h"
+#include "locate.h"
 #include <ctime>
-#include "driver.h"
 
 
 PlayerCc::PlayerClient robot(gHostname, gPort);
 PlayerCc::Position2dProxy pp(&robot, gIndex);
 PlayerCc::LaserProxy lp(&robot, gIndex);
 PlayerCc::RangerProxy rp(&robot, gIndex);
+
 time_t timer;
-Driver* d;
 
 
-Locate::Locate(){
-
+// constructor
+Locate::Locate(Driver* driver, int id, bool e)
+{
+    ID = id;
+    d = driver;
+    toError = e;
 }
 
-void Locate::run()
+// start full autonomous mode
+bool Locate::run()
 {
+    int success = false;
     timer = time(0);
 
     std::cout << robot << std::endl;
-
-    //sleep(5);
-
-    d = new Driver();
 
     // throw exceptions on creation if fail
     try{
@@ -61,9 +68,12 @@ void Locate::run()
         int index = -1;
         double boxSize = scanPoints;
 
+        if(ID == 2){
+            wait4Ready();// second robot waits for first to tell it, it can start
+        }
+
 
         //index = avoidWalls();
-
          index = locateBox();
 
 
@@ -91,14 +101,15 @@ void Locate::run()
             adjustLeft(middle);
         }
 
+        if(ID == 1){
+            success = pushRight(50);
+        }
+        else{
+            success = pushLeft(50);
+        }
 
-        // finally we can start pushing the box
-        //pushBox(3); // for pushing the box by itself
 
-        pushLeft(50);
-        //pushRight(50);  // number of iterations to push
-
-
+        clear();
 
       } // end try
       catch (PlayerCc::PlayerError & e)
@@ -107,9 +118,7 @@ void Locate::run()
       }
 
 
-    std::cout << "THE END " << std::endl;
-    clear();
-
+    return success;
 }
 
 
@@ -129,14 +138,15 @@ void Locate::clear()
 
 
 // n = number of rounds to push for
-void Locate::pushLeft(int n)
+// returns true if successfull
+//          false if unsuccessfull
+bool Locate::pushLeft(int n)
 {
     goToLeftSide();
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
-    // send that you're ready to push!
-    d->Speak();
+    d->SendReady(); // send that you're ready to push!
     wait(.5); // wait for other robot to react real quick
 
     // magnitude of the box perpendicular
@@ -151,20 +161,24 @@ void Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
-            wait4Ready();
-            pushBox(3);
-            break;
+            cout << "HELP! WHAT TO DO!?" << endl;
+            return false;
         }
 
     }
 
+    return true;
 }
 
 
 
 // n = number of rounds to push for
-void Locate::pushRight(int n)
+// returns true if successfull
+//          false if unsuccessfull
+bool Locate::pushRight(int n)
 {
+    d->SendReady(); // tell other robot it can start
+
     goToRightSide();
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
@@ -181,13 +195,17 @@ void Locate::pushRight(int n)
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
+
         // introduce error 1/2 into pushing
-        if(i >= n/2){
-            introduceError();
-            d->Speak();
-            break;
+        if(toError){
+            if(i >= n/2){
+                introduceError();
+                return false;
+            }
         }
     }
+
+    return true;
 }
 
 
@@ -204,8 +222,9 @@ void Locate::introduceError()
         pp.SetSpeed(-cap, 0.0);
     }
 
+    // 'shut-down' robot
     wait(1);
-    clear();
+    pp.SetMotorEnable(false);
 
 }
 
@@ -238,7 +257,7 @@ void Locate::wait4Ready()
 
 
 // n =  number of times to go back and forth
-void Locate::pushBox(int n)
+void Locate::pushBoxAlone(int n)
 {
     for( int i=0; i<n; ++i)
     {
@@ -253,6 +272,7 @@ void Locate::pushBox(int n)
 // t = iterations to push box for
 void Locate::push(int t)
 {
+    // ensure push defaults
     if(newturnrate != 0)
     {
         newturnrate = 0;
@@ -262,12 +282,14 @@ void Locate::push(int t)
         speed = cap;
     }
 
+    // push
     for(int i=0; i<t; ++i)
     {
         robot.Read();
         pp.SetSpeed(speed, newturnrate);
     }
 
+    // set speed back to zero
     speed = 0;
     robot.Read();
     pp.SetSpeed(speed, newturnrate);
@@ -754,7 +776,7 @@ int Locate::getBoxSize( int index)
 }
 
 
-// algorithm move away from walls but towards a box
+// algorithm to move away from walls but towards a box
 // until box within certain range
 int Locate::avoidWalls()
 {

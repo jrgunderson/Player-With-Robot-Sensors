@@ -23,12 +23,14 @@ public:
     void parse_msg(char *msg);
     void send_Bid(int rn, int str, int dist);
     void send_Ready();
+    void send_Help();
     void send_Task();
     void send_Start();
     void send_Error(char *emsg);
     void send_Move(int i, char *m);
     bool getReady();
     bool getError();
+    bool getHelp();
     int port;
 
 private:
@@ -40,6 +42,7 @@ signals:
     void readyReceived();
     void errorReceived(char *emsg);
     void moveReceived(int m);
+    void helpReceived();
 public slots:
     void startListen();
 };

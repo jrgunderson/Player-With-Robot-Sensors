@@ -1,3 +1,8 @@
+/*
+ * communicator.cpp
+ * Ian Stodart @ 2017
+ */
+
 #include "communicator.h"
 
 #define MAXBUF 1024 // maximum length of the buffer
@@ -15,6 +20,7 @@ int sfd3; //Desktop
 
 bool isReady;
 bool isError;
+bool needHelp;
 
 int lfd;
 
@@ -70,27 +76,21 @@ void Communicator::send_Bid(int rn, int str, int dist){
 
     send_cmd(sfd2, msg);
 }
-//For Robot
-void Communicator::send_Ready(){
 
+
+//For Desktop
+void Communicator::send_Start(){
     // create a message
     char *msg = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
 
-    strcpy(msg, "R");
+    strcpy(msg, "S");
     strcat(msg, "!");
-    send_cmd(sfd2,msg);
-}
 
-bool Communicator::getReady()
-{
-    return isReady;
-}
+    send_cmd(sfd1, msg);
+    send_cmd(sfd2, msg);
 
-bool Communicator::getError()
-{
-    return isError;
 }
 
 
@@ -108,20 +108,28 @@ void Communicator::send_Task(){
     send_cmd(sfd2,msg);
 }
 
-//For Desktop
-void Communicator::send_Start(){
+
+//For Robot
+void Communicator::send_Ready(){
+
     // create a message
     char *msg = NULL;
 
     msg = (char *) malloc(60*sizeof(char));
 
-    strcpy(msg, "S");
+    strcpy(msg, "R");
     strcat(msg, "!");
-
-    send_cmd(sfd1, msg);
-    send_cmd(sfd2, msg);
-
+    send_cmd(sfd1,msg);
+    send_cmd(sfd2,msg);
+    send_cmd(sfd3,msg);
 }
+
+bool Communicator::getReady()
+{
+    return isReady;
+}
+
+
 
 //For All
 void Communicator::send_Error(char *emsg){
@@ -142,6 +150,34 @@ void Communicator::send_Error(char *emsg){
     send_cmd(sfd2, msg);
     send_cmd(sfd3, msg);
 }
+
+
+bool Communicator::getError()
+{
+    return isError;
+}
+
+
+void Communicator::send_Help(){
+
+    char *msg = NULL;
+
+    msg = (char *) malloc(60*sizeof(char));
+
+    strcpy(msg, "H");
+    strcat(msg, "!");
+
+    send_cmd(sfd1,msg);
+    send_cmd(sfd2,msg);
+    send_cmd(sfd3,msg);
+}
+
+
+bool Communicator::getHelp()
+{
+    return needHelp;
+}
+
 
 //From Phone or Desktop to Either Robot
 //C will be F, B, L, or R
@@ -230,6 +266,12 @@ void Communicator::parse_msg(char *msg){
             //emit(moveReceived(m));
             emit(errorReceived(ptr));
         }
+        else if ((token[0] == 'H')) {
+            printf("This is a H type of message\n");
+            needHelp = true;
+            token = NULL;
+            emit(helpReceived());
+        }
     }
 }
 
@@ -244,6 +286,7 @@ void Communicator::startListen(){
     while (1) {
         isReady = false;
         isError = false;
+        needHelp = false;
         nbytes = listen_to_robot(lfd, msg);
 
         if (nbytes == 0) continue;

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include "driver.h"
 
 #define RAYS 32
 
@@ -19,8 +20,8 @@ public:
     int rightEye = -1;
     int leftEye = -1;
 
-    Locate();
-    void run();
+    Locate(Driver* driver, int id, bool e);
+    bool run();
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
     int getBoxSize(int index);
@@ -36,13 +37,13 @@ public:
     void turnRight(int dp);
     void goToLeftSide();
     void goToRightSide();
-    void pushBox(int n);
+    void pushBoxAlone(int n);
     void push(int t);
     int avoidWalls();
     int locateBoxOffset();
     int locateBox();
-    void pushRight(int n);
-    void pushLeft(int n);
+    bool pushRight(int n);
+    bool pushLeft(int n);
     void wait(int n);
     void wait4Ready();
     void introduceError();
@@ -57,6 +58,9 @@ private:
     double minDist = .19;  // distance robot should stop in front of box
     double minRadius = .75; // distance when robot clears walls and has def located box
     int minWallSize = 200; // size that is definitely not a box
+    Driver* d;
+    int ID;
+    bool toError;
 
 };
 
