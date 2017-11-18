@@ -4,16 +4,20 @@
 
 #include "runasrobot.h"
 
-Driver *d;
 
-RunAsRobot::RunAsRobot(int id, bool toError)
+RunAsRobot::RunAsRobot(Driver *d, int id, bool toError)
 {
     Locate* l = new Locate(d, id, toError);
-    bool success = l->run();
 
     // wait to start
-    l->wait4Ready();
+    if(id==1){
+        cout << "waiting to start" << endl;
+        l->wait4Ready();
+    }
 
+    bool success = l->run();
+
+    // if error
     if(!success){
         if(id == 1){
             // wait for HUB to tell you what to do
@@ -25,6 +29,9 @@ RunAsRobot::RunAsRobot(int id, bool toError)
         }
     }
     else{
-        // TODO: stand by for teleoperation
+        // TODO: robotB stand by for teleoperation
     }
+
+    // tell HUB task is complete
+    d->SendSuccess();
 }

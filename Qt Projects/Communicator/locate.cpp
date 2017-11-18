@@ -69,6 +69,7 @@ bool Locate::run()
         double boxSize = scanPoints;
 
         if(ID == 2){
+            cout << "waiting for other robot" << endl;
             wait4Ready();// second robot waits for first to tell it, it can start
         }
 
