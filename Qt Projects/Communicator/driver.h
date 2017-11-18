@@ -17,10 +17,13 @@ class Driver
         void SendReady();
         void SendHelp();
         void Error();
-        void Command();
+        void Move(int i);
+        void SendSuccess();
+        int getMove();
         bool isReady();
         bool isError();
         bool needHelp();
+        bool isSuccessful();
 };
 
 #endif // DRIVER_H

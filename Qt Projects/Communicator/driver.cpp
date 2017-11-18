@@ -1,8 +1,9 @@
 #include "driver.h"
 
-char ip1[] = "10.42.0.99";
-char ip2[] = "10.42.0.99";
-char ip3[] = "10.42.0.1"; // other robot
+char ip1[] = "10.42.0.1";
+char ip2[] = "10.42.0.11";
+//char ip3[] = "10.42.0.1"; // Other Robot
+char ip3[] = "10.110.250.62";
 
 Communicator* com;
 
@@ -42,6 +43,22 @@ void Driver::SendHelp()
 }
 
 
+void Driver::SendSuccess()
+{
+    com->send_Success();
+}
+
+void Driver::Move(int i)
+{
+    com->send_Move(i);
+}
+
+
+int Driver::getMove()
+{
+    return com->getMove();
+}
+
 
 bool Driver::isReady()
 {
@@ -58,4 +75,8 @@ bool Driver::needHelp()
     return com->getHelp();
 }
 
+bool Driver::isSuccessful()
+{
+    return com->getSuccess();
+}
 

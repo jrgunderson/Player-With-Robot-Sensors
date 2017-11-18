@@ -26,11 +26,14 @@ public:
     void send_Help();
     void send_Task();
     void send_Start();
+    void send_Success();
     void send_Error(char *emsg);
-    void send_Move(int i, char *m);
+    void send_Move(int i);
+    int getMove();
     bool getReady();
     bool getError();
     bool getHelp();
+    bool getSuccess();
     int port;
 
 private:
@@ -43,6 +46,7 @@ signals:
     void errorReceived(char *emsg);
     void moveReceived(int m);
     void helpReceived();
+    void successReceived();
 public slots:
     void startListen();
 };

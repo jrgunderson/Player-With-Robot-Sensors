@@ -21,6 +21,8 @@ int sfd3; //Desktop
 bool isReady;
 bool isError;
 bool needHelp;
+bool isSuccessful;
+int this_move;
 
 int lfd;
 
@@ -88,8 +90,8 @@ void Communicator::send_Start(){
     strcpy(msg, "S");
     strcat(msg, "!");
 
-    send_cmd(sfd1, msg);
     send_cmd(sfd2, msg);
+    send_cmd(sfd3, msg);
 
 }
 
@@ -119,8 +121,6 @@ void Communicator::send_Ready(){
 
     strcpy(msg, "R");
     strcat(msg, "!");
-    send_cmd(sfd1,msg);
-    send_cmd(sfd2,msg);
     send_cmd(sfd3,msg);
 }
 
@@ -179,31 +179,47 @@ bool Communicator::getHelp()
 }
 
 
-//From Phone or Desktop to Either Robot
-//C will be F, B, L, or R
-void Communicator::send_Move(int i, char *msg){
+//For Robot
+void Communicator::send_Success(){
 
-//    // create a message
-//    char *msg = NULL;
-//    char *char_m = NULL;
+    // create a message
+    char *msg = NULL;
 
-//    msg = (char *) malloc(60*sizeof(char));
+    msg = (char *) malloc(60*sizeof(char));
 
-//    itoa((int)m, char_m);
-
-//    strcpy(msg, "M");
-
-//    strcat(msg, "$");
-//    strcat(msg, char_m);
-//    strcat(msg, "!");
-
-    if(i == 0){ //Robot 1
-        send_cmd(sfd1,msg);
-    }
-    else if(i == 1){ //Robot 2
-        send_cmd(sfd2,msg);
-    }
+    strcpy(msg, "X");
+    strcat(msg, "!");
+    send_cmd(sfd3,msg);
 }
+
+bool Communicator::getSuccess()
+{
+    return isSuccessful;
+}
+
+
+//From Phone or Desktop to Either Robot
+void Communicator::send_Move(int i){
+
+    // create a message
+    char *msg = NULL;
+
+    msg = (char *) malloc(60*sizeof(char));
+
+    strcpy(msg, "M");
+    strcat(msg, "$");
+    strcat(msg, "0"+i);
+    strcat(msg, "!");
+
+    send_cmd(sfd3,msg);
+}
+
+int Communicator::getMove()
+{
+    return this_move;
+}
+
+
 
 // send command
 void Communicator::send_cmd(int sfd, char *msg){
@@ -261,16 +277,22 @@ void Communicator::parse_msg(char *msg){
             printf("This is a M type of message\n");
             ptr = strstr(token, "$");
             ptr++;
-            //int m = atoi(ptr);
+            this_move = atoi(ptr);
             token = NULL;
-            //emit(moveReceived(m));
-            emit(errorReceived(ptr));
+            emit(moveReceived(this_move));
+            //emit(errorReceived(ptr));
         }
         else if ((token[0] == 'H')) {
             printf("This is a H type of message\n");
             needHelp = true;
             token = NULL;
             emit(helpReceived());
+        }
+        else if ((token[0] == 'X')) {
+            printf("This is a X type of message\n");
+            isSuccessful = true;
+            token = NULL;
+            emit(successReceived());
         }
     }
 }
@@ -287,6 +309,9 @@ void Communicator::startListen(){
         isReady = false;
         isError = false;
         needHelp = false;
+        isSuccessful = false;
+        this_move = -1;
+
         nbytes = listen_to_robot(lfd, msg);
 
         if (nbytes == 0) continue;
