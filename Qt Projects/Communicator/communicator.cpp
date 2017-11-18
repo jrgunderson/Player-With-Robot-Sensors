@@ -148,6 +148,7 @@ void Communicator::send_Error(char *emsg){
 
     send_cmd(sfd1, msg);
     send_cmd(sfd2, msg);
+    cout << c << endl;
     send_cmd(sfd3, msg);
 }
 
@@ -203,12 +204,13 @@ void Communicator::send_Move(int i){
 
     // create a message
     char *msg = NULL;
+    char &c = to_string(i)[0];
 
     msg = (char *) malloc(60*sizeof(char));
 
     strcpy(msg, "M");
     strcat(msg, "$");
-    strcat(msg, "0"+i);
+    strcat(msg, &c);
     strcat(msg, "!");
 
     send_cmd(sfd3,msg);
@@ -278,9 +280,9 @@ void Communicator::parse_msg(char *msg){
             ptr = strstr(token, "$");
             ptr++;
             this_move = atoi(ptr);
+            cout << "this_move = " << this_move << endl;
             token = NULL;
             emit(moveReceived(this_move));
-            //emit(errorReceived(ptr));
         }
         else if ((token[0] == 'H')) {
             printf("This is a H type of message\n");

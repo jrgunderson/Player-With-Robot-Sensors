@@ -15,18 +15,15 @@ int main(int argc, char *argv[])
 {
     d = new Driver();
 
-    d->SendSuccess();
-
-
-    for(;;)
-    {
-        int i;
-        cin >> i;
-        if(i != 99){
-            d->Move(i);
-        }
-        else{ break; }
-    }
+//    for(;;)
+//    {
+//        int i;
+//        cin >> i;
+//        if(i != 99){
+//            d->Move(i);
+//        }
+//        else{ break; }
+//    }
 
     if(ID == 0){
         runAsHub();

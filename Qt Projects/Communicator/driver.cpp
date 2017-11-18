@@ -2,8 +2,7 @@
 
 char ip1[] = "10.42.0.1";
 char ip2[] = "10.42.0.11";
-//char ip3[] = "10.42.0.1"; // Other Robot
-char ip3[] = "10.110.250.62";
+char ip3[] = "10.42.0.42"; // Other Robot
 
 Communicator* com;
 
