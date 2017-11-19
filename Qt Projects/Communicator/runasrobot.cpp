@@ -5,9 +5,9 @@
 #include "runasrobot.h"
 
 
-RunAsRobot::RunAsRobot(Driver *d, int id, bool toError)
+RunAsRobot::RunAsRobot(Driver *d, int id, int pushFor, bool toError)
 {
-    Locate* l = new Locate(d, id, toError);
+    Locate* l = new Locate(d, id, pushFor, toError);
 
     // wait to start
     if(id==1){
@@ -18,18 +18,35 @@ RunAsRobot::RunAsRobot(Driver *d, int id, bool toError)
     bool success = l->run();
 
     // if error
-    if(!success){
-        if(id == 1){
+    if(!success)
+    {
+        // Robot1 do this...
+        if(id == 1)
+        {
             // wait for HUB to tell you what to do
-            l->wait4Ready();
+            {
+                int move;
+                for(;;)
+                {
+                    move = d->getMove();
+                    switch( move )
+                    {
+                        // just push box straight (for n iterations)
+                        case 0: l->push(pushFor/2); break; // divided by 2 since failure happens halfway into task
 
-            //l->pushBoxAlone();
-            l->push(50);
+                        // push box alone (number of times to push each side)
+                        case 1: l->pushBoxAlone(3); break;
 
+                        // else wait for instructions
+                        default: l->wait(1); break;
+                    }
+                }
+            }
         }
-    }
-    else{
-        // TODO: robotB stand by for teleoperation
+        // Robot2 do this...
+        else{
+            // TODO: robotB stand by for teleoperation
+        }
     }
 
     // tell HUB task is complete

@@ -28,10 +28,11 @@ time_t timer;
 
 
 // constructor
-Locate::Locate(Driver* driver, int id, bool e)
+Locate::Locate(Driver* driver, int id, int pushfor, bool e)
 {
     ID = id;
     d = driver;
+    pushFor = pushfor;
     toError = e;
 }
 
@@ -103,10 +104,10 @@ bool Locate::run()
         }
 
         if(ID == 1){
-            success = pushRight(50);
+            success = pushRight(pushFor);
         }
         else{
-            success = pushLeft(50);
+            success = pushLeft(pushFor);
         }
 
 

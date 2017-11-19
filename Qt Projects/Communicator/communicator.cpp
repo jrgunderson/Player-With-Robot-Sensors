@@ -138,17 +138,13 @@ void Communicator::send_Error(char *emsg){
 
     msg = (char *) malloc(60*sizeof(char));
 
-    strcpy(msg, "B");
+    strcpy(msg, "E");
     strcat(msg, "$");
     strcat(msg, emsg);
     strcat(msg, "!");
 
-    strcpy(msg, "E");
-    strcat(msg, "!");
-
     send_cmd(sfd1, msg);
     send_cmd(sfd2, msg);
-    cout << c << endl;
     send_cmd(sfd3, msg);
 }
 

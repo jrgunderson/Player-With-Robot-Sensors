@@ -20,7 +20,7 @@ public:
     int rightEye = -1;
     int leftEye = -1;
 
-    Locate(Driver* driver, int id, bool e);
+    Locate(Driver* driver, int id, int pushfor, bool e);
     bool run();
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
@@ -60,6 +60,7 @@ private:
     int minWallSize = 200; // size that is definitely not a box
     Driver* d;
     int ID;
+    int pushFor;
     bool toError;
 
 };
