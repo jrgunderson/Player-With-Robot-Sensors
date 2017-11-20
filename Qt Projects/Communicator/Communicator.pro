@@ -12,14 +12,16 @@ TEMPLATE = app
 SOURCES += main.cpp \
     communicate.c \
     communicator.cpp \
+    driver.cpp \
 #    locate.cpp \
-    driver.cpp
+#    runasrobot.cpp
 
 HEADERS += \
     communicate.h \
     communicator.h \ args.h \
+    driver.h \
 #    locate.h \
-    driver.h
+#    runasrobot.h
 
 linux-g++* {
     CONFIG += link_pkgconfig

@@ -74,13 +74,17 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                     move = d->getMove();
                     switch( move )
                     {
-                        case 2: //TODO: sendError && moveBackwards(); break;
+                        case 2: //TODO: moveBackwards(); break;
 
-                        case 8: //TODO: sendReady && moveStraight(); break;
+                        case 8: //TODO: moveStraight(); break;
 
-                        case 4: //TODO: sendError && moveLeft(); break;
+                        case 4: //TODO: moveLeft(); break;
 
-                        case 6: //TODO: sendReady && moveRight(); break;
+                        case 6: //TODO: moveRight(); break;
+						
+						case 11: //TODO: SendReady; break;
+						
+						case 99: //TODO: SendError; break;
 
                         // else wait for instructions
                         default: l->wait(1); break;
