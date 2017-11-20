@@ -12,7 +12,7 @@ using namespace std;
 class Driver
 {
     public:
-        explicit Driver();
+        explicit Driver(char ip[]);
         void Listen();
         void SendReady();
         void SendHelp();
@@ -20,6 +20,7 @@ class Driver
         void Move(int i);
         void SendSuccess();
         int getMove();
+        void Close();
         bool isReady();
         bool isError();
         bool needHelp();

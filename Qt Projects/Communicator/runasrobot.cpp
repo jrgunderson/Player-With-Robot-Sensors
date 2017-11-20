@@ -1,12 +1,20 @@
 /*
  * State Machine for Robots
+ *
+ * Robot1 = Right Robot
+ * Robot2 = Left Robot
+ *
+ * toError = Robot1 stops
 */
 
 #include "runasrobot.h"
 
-
-RunAsRobot::RunAsRobot(Driver *d, int id, int pushFor, bool toError)
+// id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
+RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 {
+    Driver *d;
+    d = new Driver(ip);
+
     Locate* l = new Locate(d, id, pushFor, toError);
 
     // wait to start
@@ -15,27 +23,64 @@ RunAsRobot::RunAsRobot(Driver *d, int id, int pushFor, bool toError)
         l->wait4Ready();
     }
 
-    bool success = l->run();
+    bool pushesRemain = l->run();
 
-    // if error
-    if(!success)
+    // if ERROR
+    if(pushesRemain != 0)
     {
-        // Robot1 do this...
-        if(id == 1)
+        // Robot2 do this...
+        if(id == 2)
         {
             // wait for HUB to tell you what to do
+            int move;
+            for(;;)
             {
-                int move;
-                for(;;)
+                move = d->getMove();
+                switch( move )
                 {
+                    // just push box straight (for n iterations)
+                    case 1: l->push(pushesRemain); break;
+
+                    // push box alone (number of times to push each side)
+                    case 2: l->pushBoxAlone(3); break;
+
+                    // wait for teleoperate to send signal
+                    case 3:
+                        l->wait4Ready();
+                        l->push(pushesRemain);
+                    break;
+
+                    // else wait for instructions
+                    default: l->wait(1); break;
+                }
+            }
+        }
+
+        //Robot1 do this...
+        else{
+
+            // listen for teleoperation signal
+            int move;
+            for(;;)
+            {
+                // if recieve signal that robot2 finished task
+                if(d->isSuccessful())
+                {
+                    break;
+                }
+
+                // else respond to teleoperation
+                else{
                     move = d->getMove();
                     switch( move )
                     {
-                        // just push box straight (for n iterations)
-                        case 0: l->push(pushFor/2); break; // divided by 2 since failure happens halfway into task
+                        case 2: //TODO: sendError && moveBackwards(); break;
 
-                        // push box alone (number of times to push each side)
-                        case 1: l->pushBoxAlone(3); break;
+                        case 8: //TODO: sendReady && moveStraight(); break;
+
+                        case 4: //TODO: sendError && moveLeft(); break;
+
+                        case 6: //TODO: sendReady && moveRight(); break;
 
                         // else wait for instructions
                         default: l->wait(1); break;
@@ -43,12 +88,9 @@ RunAsRobot::RunAsRobot(Driver *d, int id, int pushFor, bool toError)
                 }
             }
         }
-        // Robot2 do this...
-        else{
-            // TODO: robotB stand by for teleoperation
-        }
     }
 
     // tell HUB task is complete
     d->SendSuccess();
 }
+

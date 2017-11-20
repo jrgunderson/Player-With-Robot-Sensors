@@ -21,7 +21,7 @@ public:
     int leftEye = -1;
 
     Locate(Driver* driver, int id, int pushfor, bool e);
-    bool run();
+    int run();
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
     int getBoxSize(int index);
@@ -42,8 +42,8 @@ public:
     int avoidWalls();
     int locateBoxOffset();
     int locateBox();
-    bool pushRight(int n);
-    bool pushLeft(int n);
+    int pushRight(int n);
+    int pushLeft(int n);
     void wait(int n);
     void wait4Ready();
     void introduceError();

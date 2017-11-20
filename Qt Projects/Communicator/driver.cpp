@@ -2,21 +2,29 @@
 
 char ip1[] = "10.42.0.1";
 char ip2[] = "10.42.0.11";
-char ip3[] = "10.42.0.42"; // Other Robot
+//char ip3[] = "10.42.0.42";
 
 Communicator* com;
+thread* listen_thread;
+thread* talk_thread;
 
 
-Driver::Driver()
+Driver::Driver(char ip[])
 {
-      com = new  Communicator(ip1,ip2,ip3, 4950);
+    com = new  Communicator(ip1,ip2,ip, 4950);
 
-      thread* listen_thread = new std::thread(&Driver::Listen, this);
-      sleep(1); // a quick delay to space out threads
+    listen_thread = new std::thread(&Driver::Listen, this);
+    sleep(1); // a quick delay to space out threads
 
-      thread* talk_thread = new std::thread(&Driver::SendReady, this);
+    talk_thread = new std::thread(&Driver::SendReady, this);
 }
 
+
+void Driver::Close()
+{
+    listen_thread->detach();
+    talk_thread->detach();
+}
 
 
 void Driver::Listen()

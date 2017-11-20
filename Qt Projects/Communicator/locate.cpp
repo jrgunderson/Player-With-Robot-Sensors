@@ -5,8 +5,8 @@
  * Task 2: - adjust until front facing box
  *
  * Task 3: - move to respective corner of box
- *      a) Robot1 goes to Left side first
- *      b) Robot2 then goes to Right side
+ *      a) Robot1 goes to Right side first
+ *      b) Robot2 then goes to Left side
  *
  * Task 4: - push
  *      a) if Robot1 stops
@@ -26,6 +26,7 @@ PlayerCc::RangerProxy rp(&robot, gIndex);
 
 time_t timer;
 
+const int YES = 0;
 
 // constructor
 Locate::Locate(Driver* driver, int id, int pushfor, bool e)
@@ -37,9 +38,9 @@ Locate::Locate(Driver* driver, int id, int pushfor, bool e)
 }
 
 // start full autonomous mode
-bool Locate::run()
+int Locate::run()
 {
-    int success = false;
+    int success;
     timer = time(0);
 
     std::cout << robot << std::endl;
@@ -140,9 +141,9 @@ void Locate::clear()
 
 
 // n = number of rounds to push for
-// returns true if successfull
-//          false if unsuccessfull
-bool Locate::pushLeft(int n)
+// returns 0 if successfull
+//          else if unsuccessfull -> returns # of iterations remaining to push
+int Locate::pushLeft(int n)
 {
     goToLeftSide();
 
@@ -151,11 +152,9 @@ bool Locate::pushLeft(int n)
     d->SendReady(); // send that you're ready to push!
     wait(.5); // wait for other robot to react real quick
 
-    // magnitude of the box perpendicular
-    double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
 
     // finally start pushing
-    for(int i=0; i<n; ++i)
+    for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
@@ -164,20 +163,20 @@ bool Locate::pushLeft(int n)
         if(d->isError())
         {
             cout << "HELP! WHAT TO DO!?" << endl;
-            return false;
+            return i; // return how many iterations there are left to push
         }
 
     }
 
-    return true;
+    return YES;
 }
 
 
 
 // n = number of rounds to push for
-// returns true if successfull
-//          false if unsuccessfull
-bool Locate::pushRight(int n)
+// returns 0 if successfull
+//          else if unsuccessfull -> returns # of iterations remaining to push
+int Locate::pushRight(int n)
 {
     d->SendReady(); // tell other robot it can start
 
@@ -188,11 +187,9 @@ bool Locate::pushRight(int n)
     // wait for ready message from other robot to push
     wait4Ready();
 
-    // get current distance to neighboring roomba
-    double boxMag = sumOfMagnitudes(getBoxRightIndex(middle), getBoxLeftIndex(middle));
 
     // finally start pushing
-    for(int i=0; i<n; ++i)
+    for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
@@ -200,14 +197,14 @@ bool Locate::pushRight(int n)
 
         // introduce error 1/2 into pushing
         if(toError){
-            if(i >= n/2){
+            if(i <= n/2){
                 introduceError();
-                return false;
+                return i;
             }
         }
     }
 
-    return true;
+    return YES;
 }
 
 
@@ -258,6 +255,7 @@ void Locate::wait4Ready()
 }
 
 
+
 // n =  number of times to go back and forth
 void Locate::pushBoxAlone(int n)
 {
@@ -289,6 +287,12 @@ void Locate::push(int t)
     {
         robot.Read();
         pp.SetSpeed(speed, newturnrate);
+
+        // will pause if receive error
+        if(d->isError())
+        {
+            wait4Ready();
+        }
     }
 
     // set speed back to zero

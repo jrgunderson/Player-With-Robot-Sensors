@@ -6,7 +6,7 @@
 class RunAsRobot
 {
 public:
-    RunAsRobot(Driver *d, int id, int pushFor, bool toError);
+    RunAsRobot(int id, char ip[], int pushFor, bool toError);
 };
 
 #endif // RUNASROBOT_H
