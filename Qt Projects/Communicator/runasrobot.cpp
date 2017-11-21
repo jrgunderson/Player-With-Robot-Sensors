@@ -9,11 +9,12 @@
 
 #include "runasrobot.h"
 
+char hostIP[] = "10.42.0.1";
+
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
 RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 {
-    Driver *d;
-    d = new Driver(ip);
+    Driver *d = new Driver(ip);
 
     Locate* l = new Locate(d, id, pushFor, toError);
 
@@ -23,19 +24,23 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
         l->wait4Ready();
     }
 
-    bool pushesRemain = l->run();
+    int pushesRemain = l->run();
+
+    Driver *hd = new Driver(hostIP);
 
     // if ERROR
-    if(pushesRemain != 0)
+    if(pushesRemain > 0)
     {
         // Robot2 do this...
         if(id == 2)
         {
+            d->SendHelp();
+
             // wait for HUB to tell you what to do
             int move;
             for(;;)
             {
-                move = d->getMove();
+                move = hd->getMove();
                 switch( move )
                 {
                     // just push box straight (for n iterations)
@@ -64,14 +69,14 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
             for(;;)
             {
                 // if recieve signal that robot2 finished task
-                if(d->isSuccessful())
+                if(hd->isSuccessful())
                 {
                     break;
                 }
 
                 // else respond to teleoperation
                 else{
-                    move = d->getMove();
+                    move = hd->getMove();
                     switch( move )
                     {
                         case 2: //TODO: moveBackwards(); break;
@@ -95,6 +100,6 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     }
 
     // tell HUB task is complete
-    d->SendSuccess();
+    hd->SendSuccess();
 }
 

@@ -1,8 +1,8 @@
 #include "driver.h"
 
-char ip1[] = "10.42.0.1";
-char ip2[] = "10.42.0.11";
-//char ip3[] = "10.42.0.42";
+char ip1[] = "10.42.0.99";
+char ip2[] = "10.42.0.99";
+//char ip3[] = "10.42.0.42"; //other robot
 
 Communicator* com;
 thread* listen_thread;
@@ -16,14 +16,14 @@ Driver::Driver(char ip[])
     listen_thread = new std::thread(&Driver::Listen, this);
     sleep(1); // a quick delay to space out threads
 
-    talk_thread = new std::thread(&Driver::SendReady, this);
+    talk_thread = new std::thread();
 }
 
 
 void Driver::Close()
 {
-    listen_thread->detach();
-    talk_thread->detach();
+    listen_thread->join();
+    talk_thread->join();
 }
 
 
@@ -36,6 +36,7 @@ void Driver::Listen()
 void Driver::SendReady()
 {
     com->send_Ready();
+    com->send_Ready(); // send 2 just in-case didn't recieve 1st
 }
 
 

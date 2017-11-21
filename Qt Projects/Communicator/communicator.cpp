@@ -143,8 +143,8 @@ void Communicator::send_Error(char *emsg){
     strcat(msg, emsg);
     strcat(msg, "!");
 
-    send_cmd(sfd1, msg);
-    send_cmd(sfd2, msg);
+//    send_cmd(sfd1, msg);
+//    send_cmd(sfd2, msg);
     send_cmd(sfd3, msg);
 }
 
@@ -164,8 +164,8 @@ void Communicator::send_Help(){
     strcpy(msg, "H");
     strcat(msg, "!");
 
-    send_cmd(sfd1,msg);
-    send_cmd(sfd2,msg);
+//    send_cmd(sfd1,msg);
+//    send_cmd(sfd2,msg);
     send_cmd(sfd3,msg);
 }
 
@@ -313,7 +313,7 @@ void Communicator::startListen(){
         nbytes = listen_to_robot(lfd, msg);
 
         if (nbytes == 0) continue;
-        printf("I received message: %s\n", msg);
+        //printf("I received message: %s\n", msg);
         parse_msg(msg);
         sleep(3);
     }
