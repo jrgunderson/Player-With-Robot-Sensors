@@ -49,6 +49,11 @@ public:
     void introduceError();
     double sumOfMagnitudes(int start, int end);
     void clear();
+    void moveBackards();
+    void moveForwards();
+    void moveLeft();
+    void moveRight();
+    void stop();
 
 private:
 

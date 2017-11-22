@@ -137,7 +137,35 @@ void Locate::clear()
     }
 }
 
+void Locate::stop()
+{
+    robot.Read();
+    pp.SetSpeed(0.0, 0.0);
+}
 
+void Locate::moveBackards()
+{
+    robot.Read();
+    pp.SetSpeed(-cap, 0.0);
+}
+
+void Locate::moveForwards()
+{
+    robot.Read();
+    pp.SetSpeed(cap, 0.0);
+}
+
+void Locate::moveRight()
+{
+    robot.Read();
+    pp.SetSpeed(0.0, -cap);
+}
+
+void Locate::moveLeft()
+{
+    robot.Read();
+    pp.SetSpeed(0.0, cap);
+}
 
 
 // n = number of rounds to push for
@@ -162,6 +190,7 @@ int Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
+		  wait(1);
             cout << "HELP! WHAT TO DO!?" << endl;
             return i; // return how many iterations there are left to push
         }
@@ -178,7 +207,6 @@ int Locate::pushLeft(int n)
 //          else if unsuccessfull -> returns # of iterations remaining to push
 int Locate::pushRight(int n)
 {
-    d->SendReady(); // tell other robot it can start
 
     goToRightSide();
 
@@ -309,6 +337,8 @@ void Locate::goToRightSide()
     // assuming robot front-facing box -> turn left 90 degrees
     turnRight(middle);
     adjustRight(left);
+
+    d->SendReady(); // tell other robot it can start
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up

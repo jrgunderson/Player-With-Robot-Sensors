@@ -251,16 +251,19 @@ void Communicator::parse_msg(char *msg){
             printf("This is a R type of message\n");
             isReady = true;
             token = NULL;
+            sleep(1);
             emit(startReceived());
         }
         else if ((token[0] == 'T')) {
             printf("This is a T type of message\n");
             token = NULL;
+            sleep(1);
             emit(taskReceived());
         }
         else if ((token[0] == 'S')) {
             printf("This is a S type of message\n");
             token = NULL;
+            sleep(1);
             emit(startReceived());
         }
         else if ((token[0] == 'E')) {
@@ -269,6 +272,7 @@ void Communicator::parse_msg(char *msg){
             ptr = strstr(token, "$");
             ptr++;
             token = NULL;
+            sleep(1);
             emit(errorReceived(ptr));
         }
         else if ((token[0] == 'M')) {
@@ -276,20 +280,23 @@ void Communicator::parse_msg(char *msg){
             ptr = strstr(token, "$");
             ptr++;
             this_move = atoi(ptr);
-            cout << "this_move = " << this_move << endl;
+            //cout << "this_move = " << this_move << endl;
             token = NULL;
+            sleep(1);
             emit(moveReceived(this_move));
         }
         else if ((token[0] == 'H')) {
             printf("This is a H type of message\n");
             needHelp = true;
             token = NULL;
+            sleep(1);
             emit(helpReceived());
         }
         else if ((token[0] == 'X')) {
             printf("This is a X type of message\n");
             isSuccessful = true;
             token = NULL;
+            sleep(1);
             emit(successReceived());
         }
     }

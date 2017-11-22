@@ -34,7 +34,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
         // Robot2 do this...
         if(id == 2)
         {
-            d->SendHelp();
+            hd->SendHelp();
 
             // wait for HUB to tell you what to do
             int move;
@@ -44,19 +44,20 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                 switch( move )
                 {
                     // just push box straight (for n iterations)
-                    case 1: l->push(pushesRemain); break;
+                    case 1: l->push(pushesRemain); pushesRemain =0; break;
 
                     // push box alone (number of times to push each side)
-                    case 2: l->pushBoxAlone(3); break;
+                    case 2: l->pushBoxAlone(3); pushesRemain =0; break;
 
                     // wait for teleoperate to send signal
                     case 3:
                         l->wait4Ready();
                         l->push(pushesRemain);
+                        pushesRemain =0;
                     break;
-
-                    // else wait for instructions
-                    default: l->wait(1); break;
+                }
+                if(pushesRemain == 0){
+                    break;
                 }
             }
         }
@@ -69,7 +70,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
             for(;;)
             {
                 // if recieve signal that robot2 finished task
-                if(hd->isSuccessful())
+                if(d->isSuccessful())
                 {
                     break;
                 }
@@ -79,20 +80,22 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                     move = hd->getMove();
                     switch( move )
                     {
-                        case 2: //TODO: moveBackwards(); break;
+                        case 2: l->moveBackards(); break;
 
-                        case 8: //TODO: moveStraight(); break;
+                        case 8: l->moveForwards(); break;
 
-                        case 4: //TODO: moveLeft(); break;
+                        case 4: l->moveRight(); break;
 
-                        case 6: //TODO: moveRight(); break;
+                        case 6: l->moveLeft(); break;
 						
-						case 11: //TODO: SendReady; break;
+                        case 1: d->SendReady(); break;
 						
-						case 99: //TODO: SendError; break;
+                        case 9: d->Error(); break;
 
-                        // else wait for instructions
-                        default: l->wait(1); break;
+                        case 99: d->SendSuccess(); break;
+
+                        // else don't move
+                        default: l->stop(); break;
                     }
                 }
             }

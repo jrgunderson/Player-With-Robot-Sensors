@@ -36,7 +36,6 @@ void Driver::Listen()
 void Driver::SendReady()
 {
     com->send_Ready();
-    com->send_Ready(); // send 2 just in-case didn't recieve 1st
 }
 
 
