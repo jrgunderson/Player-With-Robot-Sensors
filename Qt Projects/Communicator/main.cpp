@@ -13,12 +13,7 @@ bool toError = true; // introduce error?
 
 void runAsHub(Driver *d);
 
-/*
- * TODO: RunAsRobot Constructor will run TWO SEPERATE METHODS based on ID
- * Robot2 will switch Drivers (does ALL talking to HUB)
- * Robot1 MUST NOT have option to SWITCH DRIVERS (because needs to be teleoperated)
- * HUB also does NOT change drivers -> so if HUB needs to talk to Robot2, must do so through Robot1
-*/
+
 int main(int argc, char *argv[])
 {
 
@@ -37,6 +32,7 @@ int main(int argc, char *argv[])
 }
 
 // State Machine for HUB
+// HUB must NOT change drivers -> all communications to Robot2 must be relayed Robot1
 void runAsHub(Driver *d)
 {
 
@@ -46,32 +42,24 @@ void runAsHub(Driver *d)
     d->SendReady(); // tell robot1 to start
     cout << "Let the trials begin!" << endl;
 
+
     // wait to see if robot's completed task
     bool taskComplete= false;
     for(;;)
     {           
-        if(d->needHelp()) // message comes from robot2, but for some reason can only hear on robot1 thread
+        if(d->needHelp())
         {
-            Driver *r2d = new Driver(ipLeft); // only works if i put robot2 thread after
-
             cout << "Robot2 Needs Help!\n 1=push straight, 2=push alone, 3=teleoperate Robot1" << endl;
 
-            // tell robot how to continue
+            // tell robot2 how to continue
             cin >>  todo;
-            r2d->Move(todo);
+            todo += 10; // convert to format for Robot1 to pass message to Robot2
+            d->Move(todo);
 
 
             // if teleoperating Robot1
-            /*
-             * Unable to teleoperate Robot1 while simultaneously telling Robot2 when its OK to push
-             *
-             * TODO: redesign communication
-             *          OR
-             *      figure out how to chain communication AS TO avoid switching Drivers
-            */
-            if(todo == 3)
+            if(todo == 13)
             {
-                d= new Driver(ipRight);
                  cout << "2=reverse, 4=left, 6=right, 8=forward,\n 1=SendReady, 9=SendError, 99=TaskComplete" << endl;
                  for(;;){
                      cin >>  todo;
@@ -86,16 +74,16 @@ void runAsHub(Driver *d)
             }
 
         }
+
+        // if Robot2 told me task complete
         else if(d->isSuccessful())
         {
             cout << "! TASK COMPLETE !" << endl;
-
-            d = new Driver(ipRight);
             d->SendSuccess(); // tell robot1 to stand down
-            d->SendSuccess(); // needs to be done twice for some reason
-
             break;
         }
+
+        // if HUB decided task is complete
         else if(taskComplete){
             break;
         }
