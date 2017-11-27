@@ -3,7 +3,7 @@
 #include <string>
 #include "runasrobot.h"
 
-int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
+int ID = 99;  // 0=HUB, 1=Robot1, 2=Robot2
 char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
 
@@ -22,12 +22,22 @@ int main(int argc, char *argv[])
         Driver *d = new Driver(ipRight);
         runAsHub(d);
     }
+
     else if(ID == 1){
         new RunAsRobot(ID, ipLeft, pushFor, toError);
     }
+
     else if(ID == 2){
         new RunAsRobot(ID, ipRight, pushFor, toError);
     }
+
+    // DEBUG
+    else if(ID == 99)
+    {
+        char ip[] = "";
+        Driver *d = new Driver(ip);
+    }
+
 
 }
 

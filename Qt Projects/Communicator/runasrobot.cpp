@@ -45,13 +45,13 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                  switch( move )
                  {
                      // just push box straight (for n iterations)
-                     case 11: l->push(pushesRemain); pushesRemain =0; break;
+                     case 1: l->push(pushesRemain); pushesRemain =0; break;
 
                      // push box alone (number of times to push each side)
-                     case 12: l->pushBoxAlone(3); pushesRemain =0; break;
+                     case 2: l->pushBoxAlone(3); pushesRemain =0; break;
 
                      // wait for teleoperate to send signal
-                     case 13:
+                     case 3:
                          l->wait4Ready();
                          l->push(pushesRemain);
                          pushesRemain =0;
