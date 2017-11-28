@@ -3,7 +3,7 @@
 #include <string>
 #include "runasrobot.h"
 
-int ID = 99;  // 0=HUB, 1=Robot1, 2=Robot2
+int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
 char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
 
@@ -23,18 +23,18 @@ int main(int argc, char *argv[])
         runAsHub(d);
     }
 
-    else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, pushFor, toError);
-    }
-
-    else if(ID == 2){
-        new RunAsRobot(ID, ipRight, pushFor, toError);
-    }
+//    else if(ID == 1){
+//        new RunAsRobot(ID, ipLeft, pushFor, toError);
+//    }
+//    else if(ID == 2){
+//        new RunAsRobot(ID, ipRight, pushFor, toError);
+//    }
 
     // DEBUG
     else if(ID == 99)
     {
         char ip[] = "";
+        cout << "Entering DEBUG mode" << endl;
         Driver *d = new Driver(ip);
     }
 
@@ -70,7 +70,7 @@ void runAsHub(Driver *d)
             // if teleoperating Robot1
             if(todo == 13)
             {
-                 cout << "2=reverse, 4=left, 6=right, 8=forward,\n 1=SendReady, 9=SendError, 99=TaskComplete" << endl;
+                 cout << "0=stop, 2=reverse, 4=left, 6=right, 8=forward,\n1=SendReady, 9=SendError, 99=TaskComplete" << endl;
                  for(;;){
                      cin >>  todo;
                      d->Move(todo);

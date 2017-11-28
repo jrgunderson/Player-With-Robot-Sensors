@@ -45,7 +45,7 @@ public:
     int pushRight(int n);
     int pushLeft(int n);
     void wait(int n);
-    void wait4Ready();
+    bool wait4Ready();
     void introduceError();
     double sumOfMagnitudes(int start, int end);
     void clear();

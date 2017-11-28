@@ -13,15 +13,15 @@ SOURCES += main.cpp \
     communicate.c \
     communicator.cpp \
     driver.cpp \
-#    locate.cpp \
-#    runasrobot.cpp
+    locate.cpp \
+    runasrobot.cpp
 
 HEADERS += \
     communicate.h \
     communicator.h \ args.h \
     driver.h \
-#    locate.h \
-#    runasrobot.h
+    locate.h \
+    runasrobot.h
 
 linux-g++* {
     CONFIG += link_pkgconfig

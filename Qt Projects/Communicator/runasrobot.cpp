@@ -44,7 +44,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                  move = hd->getMove();
                  switch( move )
                  {
-                     // just push box straight (for n iterations)
+                     // just push box straight
                      case 1: l->push(pushesRemain); pushesRemain =0; break;
 
                      // push box alone (number of times to push each side)
@@ -53,8 +53,8 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                      // wait for teleoperate to send signal
                      case 3:
                          l->wait4Ready();
-                         l->push(pushesRemain);
-                         pushesRemain =0;
+                         l->push(100);     // arbitrary push count,
+                         pushesRemain = 0; // robot stops pushing when told to
                      break;
                  }
                  if(pushesRemain == 0){
@@ -68,7 +68,9 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     }
 
     // Robot1 do this...
-    else{
+    else
+    {
+        bool giveup = false;
 
         // Regardless if ERROR or not...
         int move;
@@ -87,31 +89,37 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                 switch( move )
                 {
                     // teleoperation controls
+                    case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
+
                     case 2: l->moveBackards(); break;
 
+                    case 4: l->moveLeft(); break;
+
+                    case 6: l->moveRight(); break;
+
                     case 8: l->moveForwards(); break;
-
-                    case 4: l->moveRight(); break;
-
-                    case 6: l->moveLeft(); break;
 
                     // robot2 messages
                     case 1: d->SendReady(); break;
 
                     case 9: d->Error(); break;
 
-                    case 11: d->Move(1); break;
-                    case 12: d->Move(2); break;
-                    case 13: d->Move(3); break;
+                    case 11: d->Move(1); sleep(1); giveup = true; break;
+                    case 12: d->Move(2); sleep(1); giveup = true; break;
+                    case 13: d->Move(3); sleep(1); break;
 
-                    case 99: d->SendSuccess(); break;
+                    case 99: d->SendSuccess(); giveup = true; break;
 
                     // else don't move
                     default: l->stop(); break;
                 }
             }
-        }
 
+            if(giveup){
+                break;
+            }
+
+        }
     }
 
 

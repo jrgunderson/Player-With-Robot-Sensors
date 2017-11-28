@@ -267,8 +267,9 @@ void Locate::wait(int n )
 }
 
 
-// wait for ready message from other robot to push
-void Locate::wait4Ready()
+// wait for 'ready' message to push
+// or wait for 'end' message to stop
+bool Locate::wait4Ready()
 {
     for(;;){
 
@@ -276,10 +277,15 @@ void Locate::wait4Ready()
         {
             break;
         }
+        else if(d->isSuccessful())
+        {
+            return true;
+        }
         else{
             wait(1);
         }
     }
+    return 0; // arbitrary value, never used
 }
 
 
@@ -311,6 +317,7 @@ void Locate::push(int t)
     }
 
     // push
+    bool over = false;
     for(int i=0; i<t; ++i)
     {
         robot.Read();
@@ -319,7 +326,12 @@ void Locate::push(int t)
         // will pause if receive error
         if(d->isError())
         {
-            wait4Ready();
+            over = wait4Ready();
+
+            // will exit if
+            if(over){
+                break;
+            }
         }
     }
 
@@ -338,7 +350,9 @@ void Locate::goToRightSide()
     turnRight(middle);
     adjustRight(left);
 
-    d->SendReady(); // tell other robot it can start
+    if(ID == 1){
+    	    d->SendReady(); // tell other robot it can start
+    }
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up
