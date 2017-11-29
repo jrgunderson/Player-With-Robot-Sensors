@@ -313,9 +313,6 @@ bool Locate::wait4ready()
         else{
             wait(1);
         }
-
-        rightHyp = getRightHypotenuse();
-        leftHyp = getLeftHypotenuse();
     }
     return 0; // arbitrary value, never used
 }
@@ -386,8 +383,6 @@ void Locate::push(int t)
                 break;
             }
         }
-        rightHyp = getRightHypotenuse();
-        leftHyp = getLeftHypotenuse();
     }
 
     // set speed back to zero
@@ -438,7 +433,7 @@ void Locate::goToRightSide()
     adjustRight(left);
 
     if(ID == 1){
-    	    d->SendReady(); // tell other robot it can start
+            d->SendStart(); // tell other robot it can start
     }
 
     // assuming robot's eyesight is parallel to box
