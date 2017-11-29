@@ -191,7 +191,6 @@ int Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
-		  wait(1);
             cout << "HELP! WHAT TO DO!?" << endl;
             return i; // return how many iterations there are left to push
         }
@@ -227,6 +226,7 @@ int Locate::pushRight(int n)
         // introduce error 1/2 into pushing
         if(toError){
             if(i <= n/2){
+			 d->Error();
                 introduceError();
                 return i;
             }
@@ -240,7 +240,7 @@ int Locate::pushRight(int n)
 // 1) send error, 2) get out of way, 3) turn off motor
 void Locate::introduceError()
 {
-    d->Error();
+    //d->Error();
     wait(5);
 
     // go backwards
