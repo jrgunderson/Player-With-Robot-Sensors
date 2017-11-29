@@ -96,6 +96,11 @@ void Communicator::send_Start(){
 
 }
 
+bool Communicator::getStart()
+{
+    return toStart;
+}
+
 
 //For Desktop
 void Communicator::send_Task(){
@@ -123,11 +128,6 @@ void Communicator::send_Ready(){
     strcpy(msg, "R");
     strcat(msg, "!");
     send_cmd(sfd3,msg);
-}
-
-bool Communicator::getStart()
-{
-    return toStart;
 }
 
 bool Communicator::getReady()
