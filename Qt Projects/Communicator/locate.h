@@ -45,8 +45,8 @@ public:
     int locateBoxOffset();
     int locateBox();
     double sumOfMagnitudes(int start, int end);
-    int getRightHypotenuse();
-    int getLeftHypotenuse();
+    double getRightHypotenuse();
+    double getLeftHypotenuse();
     bool didTilt(int iLeft, int iRight);
     void wait(int n);
     bool wait4Ready();

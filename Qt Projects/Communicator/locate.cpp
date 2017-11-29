@@ -181,11 +181,22 @@ int Locate::pushLeft(int n)
     wait(.5); // wait for other robot to react real quick
 
 
+    double rightHyp = getRightHypotenuse();
+    double leftHyp = getLeftHypotenuse();
+
     // finally start pushing
     for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
+
+        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
+
+        // error detection (not forced)
+        if( didTilt(leftHyp,rightHyp))
+        {
+            wait4Ready();
+        }
 
         // if other robot malfunctions
         if(d->isError())
@@ -216,12 +227,23 @@ int Locate::pushRight(int n)
     wait4Ready();
 
 
+    double rightHyp = getRightHypotenuse();
+    double leftHyp = getLeftHypotenuse();
+
     // finally start pushing
     for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
+
+        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
+
+        // error detection (not forced)
+        if( didTilt(leftHyp,rightHyp))
+        {
+            wait4Ready();
+        }
 
         // introduce error 1/2 into pushing
         if(toError){
@@ -271,8 +293,8 @@ void Locate::wait(int n )
 // or wait for 'end' message to stop
 bool Locate::wait4Ready()
 {
-    int rightHyp = getRightHypotenuse();
-    int leftHyp = getLeftHypotenuse();
+    double rightHyp = getRightHypotenuse();
+    double leftHyp = getLeftHypotenuse();
 
     for(;;)
     {
@@ -316,8 +338,8 @@ void Locate::pushBoxAlone(int n)
 // t = iterations to push box for
 void Locate::push(int t)
 {
-    int rightHyp = getRightHypotenuse();
-    int leftHyp = getLeftHypotenuse();
+    double rightHyp = getRightHypotenuse();
+    double leftHyp = getLeftHypotenuse();
 
     // ensure push defaults
     if(newturnrate != 0)
@@ -362,7 +384,7 @@ void Locate::push(int t)
 
 // returns the distance from robot to right edge of box
 // assumes robot front facing box (forming a right degree angle)
-int Locate::getRightHypotenuse()
+double Locate::getRightHypotenuse()
 {
     return lp[getBoxRightIndex(middle)];
 }
@@ -370,7 +392,7 @@ int Locate::getRightHypotenuse()
 
 // returns the distance from robot to left edge of box
 // assumes robot front facing box (forming a right degree angle)
-int Locate::getLeftHypotenuse()
+double Locate::getLeftHypotenuse()
 {
     return lp[getBoxLeftIndex(middle)];
 }

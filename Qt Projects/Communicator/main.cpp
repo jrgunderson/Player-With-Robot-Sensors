@@ -3,12 +3,12 @@
 #include <string>
 #include "runasrobot.h"
 
-int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
+int ID = 2;  // 0=HUB, 1=Robot1, 2=Robot2
 char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
 
 int pushFor = 50; // number of iterations to push box for
-bool toError = true; // introduce error?
+bool toError = 0; // introduce error?
 
 
 void runAsHub(Driver *d);
