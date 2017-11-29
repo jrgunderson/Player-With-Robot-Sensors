@@ -72,7 +72,7 @@ int Locate::run()
 
         if(ID == 2){
             cout << "waiting for other robot" << endl;
-            wait4Ready();// second robot waits for first to tell it, it can start
+            wait2start();// second robot waits for first to tell it, it can start
         }
 
 
@@ -195,7 +195,7 @@ int Locate::pushLeft(int n)
         // error detection (not forced)
         if( didTilt(leftHyp,rightHyp))
         {
-            wait4Ready();
+            wait4ready();
         }
 
         // if other robot malfunctions
@@ -224,7 +224,7 @@ int Locate::pushRight(int n)
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
     // wait for ready message from other robot to push
-    wait4Ready();
+    wait4ready();
 
 
     double rightHyp = getRightHypotenuse();
@@ -242,7 +242,7 @@ int Locate::pushRight(int n)
         // error detection (not forced)
         if( didTilt(leftHyp,rightHyp))
         {
-            wait4Ready();
+            wait4ready();
         }
 
         // introduce error 1/2 into pushing
@@ -291,7 +291,7 @@ void Locate::wait(int n )
 
 // wait for 'ready' message or 'change in box orientation' to push
 // or wait for 'end' message to stop
-bool Locate::wait4Ready()
+bool Locate::wait4ready()
 {
     double rightHyp = getRightHypotenuse();
     double leftHyp = getLeftHypotenuse();
@@ -320,7 +320,23 @@ bool Locate::wait4Ready()
     return 0; // arbitrary value, never used
 }
 
+// do nothing until start signal recieved
+void Locate::wait2start()
+{
+    for(;;)
+    {
 
+        if( d->toStart() )
+        {
+            break;
+        }
+
+        else{
+            wait(1);
+        }
+
+    }
+}
 
 // n =  number of times to go back and forth
 void Locate::pushBoxAlone(int n)
@@ -363,7 +379,7 @@ void Locate::push(int t)
         // will pause if receive error
         if(d->isError() || didTilt(leftHyp,rightHyp))
         {
-            over = wait4Ready();
+            over = wait4ready();
 
             // will exit if received End_Task signal while waiting
             if(over){

@@ -33,11 +33,15 @@ void Driver::Listen()
 }
 
 
+void Driver::SendStart()
+{
+    com->send_Start();
+}
+
 void Driver::SendReady()
 {
     com->send_Ready();
 }
-
 
 void Driver::Error()
 {
@@ -66,6 +70,10 @@ int Driver::getMove()
     return com->getMove();
 }
 
+bool Driver::toStart()
+{
+    return com->getStart();
+}
 
 bool Driver::isReady()
 {

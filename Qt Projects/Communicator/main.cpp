@@ -3,11 +3,11 @@
 #include <string>
 #include "runasrobot.h"
 
-int ID = 2;  // 0=HUB, 1=Robot1, 2=Robot2
+int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
 char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
 
-int pushFor = 50; // number of iterations to push box for
+int pushFor = 75; // number of iterations to push box for
 bool toError = 0; // introduce error?
 
 
@@ -50,7 +50,7 @@ void runAsHub(Driver *d)
     int todo;
     cout << "Press [1] when ready to commence trials" << endl;
     cin >>  todo;
-    d->SendReady(); // tell robot1 to start
+    d->SendStart(); // tell robot1 to start
     cout << "Let the trials begin!" << endl;
 
 

@@ -18,6 +18,7 @@ int sfd1; //Robot
 int sfd2; //Other Robot or Phone
 int sfd3; //Desktop
 
+bool toStart;
 bool isReady;
 bool isError;
 bool needHelp;
@@ -124,11 +125,15 @@ void Communicator::send_Ready(){
     send_cmd(sfd3,msg);
 }
 
+bool Communicator::getStart()
+{
+    return toStart;
+}
+
 bool Communicator::getReady()
 {
     return isReady;
 }
-
 
 
 //For All
@@ -261,6 +266,7 @@ void Communicator::parse_msg(char *msg){
             emit(taskReceived());
         }
         else if ((token[0] == 'S')) {
+            toStart = true;
             printf("This is a S type of message\n");
             token = NULL;
             sleep(1);
@@ -311,6 +317,7 @@ void Communicator::startListen(){
     lfd = create_listen(port,H);
 
     while (1) {
+        toStart = false;
         isReady = false;
         isError = false;
         needHelp = false;

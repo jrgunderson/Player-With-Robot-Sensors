@@ -14,6 +14,7 @@ class Driver
     public:
         explicit Driver(char ip[]);
         void Listen();
+        void SendStart();
         void SendReady();
         void SendHelp();
         void Error();
@@ -21,6 +22,7 @@ class Driver
         void SendSuccess();
         int getMove();
         void Close();
+        bool toStart();
         bool isReady();
         bool isError();
         bool needHelp();

@@ -49,7 +49,8 @@ public:
     double getLeftHypotenuse();
     bool didTilt(int iLeft, int iRight);
     void wait(int n);
-    bool wait4Ready();
+    bool wait4ready();
+    void wait2start();
     void introduceError();
     void clear();
     void moveBackards();

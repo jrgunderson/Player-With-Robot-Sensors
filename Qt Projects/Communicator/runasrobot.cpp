@@ -21,7 +21,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     // wait to start
     if(id==1){
         cout << "waiting to start" << endl;
-        l->wait4Ready();
+        l->wait2start();
     }
 
     int pushesRemain = l->run();
@@ -52,7 +52,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 
                      // wait for teleoperate to send signal
                      case 3:
-                         l->wait4Ready();
+                         l->wait4ready();
                          l->push(100);     // arbitrary push count,
                          pushesRemain = 0; // robot stops pushing when told to
                      break;
