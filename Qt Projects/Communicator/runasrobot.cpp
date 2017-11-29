@@ -91,13 +91,13 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                     // teleoperation controls
                     case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
 
-                    case 2: l->moveBackards(); break;
+                    case 2: l->moveBackards(); sleep(1); break;
 
-                    case 4: l->moveLeft(); break;
+                    case 4: l->moveLeft(); sleep(1); break;
 
-                    case 6: l->moveRight(); break;
+                    case 6: l->moveRight(); sleep(1); break;
 
-                    case 8: l->moveForwards(); break;
+                    case 8: l->moveForwards(); sleep(1); break;
 
                     // robot2 messages
                     case 1: d->SendReady(); break;
@@ -110,9 +110,10 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 
                     case 99: d->SendSuccess(); giveup = true; break;
 
-                    // stop between each move
-                    l->stop(); break;
+                    default: l->stop(); break;
                 }
+			 // stop between each move
+                l->stop();
             }
 
             if(giveup){

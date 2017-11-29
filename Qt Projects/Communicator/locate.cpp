@@ -146,25 +146,25 @@ void Locate::stop()
 void Locate::moveBackards()
 {
     robot.Read();
-    pp.SetSpeed(-cap, 0.0);
+    pp.SetSpeed(-cap/2, 0.0);
 }
 
 void Locate::moveForwards()
 {
     robot.Read();
-    pp.SetSpeed(cap, 0.0);
+    pp.SetSpeed(cap/2, 0.0);
 }
 
 void Locate::moveRight()
 {
     robot.Read();
-    pp.SetSpeed(0.0, -cap);
+    pp.SetSpeed(0.0, -cap/2);
 }
 
 void Locate::moveLeft()
 {
     robot.Read();
-    pp.SetSpeed(0.0, cap);
+    pp.SetSpeed(0.0, cap/2);
 }
 
 
