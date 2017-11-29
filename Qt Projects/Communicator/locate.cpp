@@ -181,22 +181,12 @@ int Locate::pushLeft(int n)
     wait(.5); // wait for other robot to react real quick
 
 
-    double rightHyp = getRightHypotenuse();
-    double leftHyp = getLeftHypotenuse();
-
     // finally start pushing
     for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
-        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
-
-        // error detection (not forced)
-        if( didTilt(leftHyp,rightHyp))
-        {
-            wait4ready();
-        }
 
         // if other robot malfunctions
         if(d->isError())
@@ -227,23 +217,12 @@ int Locate::pushRight(int n)
     wait4ready();
 
 
-    double rightHyp = getRightHypotenuse();
-    double leftHyp = getLeftHypotenuse();
-
     // finally start pushing
     for(int i=n; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(cap, 0.0);
 
-
-        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
-
-        // error detection (not forced)
-        if( didTilt(leftHyp,rightHyp))
-        {
-            wait4ready();
-        }
 
         // introduce error 1/2 into pushing
         if(toError){
@@ -293,19 +272,15 @@ void Locate::wait(int n )
 // or wait for 'end' message to stop
 bool Locate::wait4ready()
 {
-    double rightHyp = getRightHypotenuse();
-    double leftHyp = getLeftHypotenuse();
 
     for(;;)
     {
-        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
-
         if(d->isSuccessful())
         {
             return true;
         }
 
-        else if(d->isReady() || didTilt(leftHyp,rightHyp))
+        else if( d->isReady() )
         {
             break;
         }
@@ -351,8 +326,6 @@ void Locate::pushBoxAlone(int n)
 // t = iterations to push box for
 void Locate::push(int t)
 {
-    double rightHyp = getRightHypotenuse();
-    double leftHyp = getLeftHypotenuse();
 
     // ensure push defaults
     if(newturnrate != 0)
@@ -371,10 +344,9 @@ void Locate::push(int t)
         robot.Read();
         pp.SetSpeed(speed, newturnrate);
 
-        cout << "Right Mag= " << rightHyp << ", Left Mag= " << leftHyp << endl;
 
         // will pause if receive error
-        if(d->isError() || didTilt(leftHyp,rightHyp))
+        if( d->isError() )
         {
             over = wait4ready();
 
@@ -390,39 +362,7 @@ void Locate::push(int t)
     robot.Read();
     pp.SetSpeed(speed, newturnrate);
 
-}
-
-
-// returns the distance from robot to right edge of box
-// assumes robot front facing box (forming a right degree angle)
-double Locate::getRightHypotenuse()
-{
-    return lp[getBoxRightIndex(middle)];
-}
-
-
-// returns the distance from robot to left edge of box
-// assumes robot front facing box (forming a right degree angle)
-double Locate::getLeftHypotenuse()
-{
-    return lp[getBoxLeftIndex(middle)];
-}
-
-
-// returns true if tilt detected in box's orientation
-bool Locate::didTilt(int iLeft, int iRight)
-{
-    if( abs( getRightHypotenuse() - iRight ) > .5 )
-    {
-        return true;
-    }
-    else if( abs( getLeftHypotenuse() - iLeft ) > .5 )
-    {
-        return true;
-    }
-
-    return false;
-}
+}\
 
 
 // send robot to right side of box
@@ -1205,4 +1145,51 @@ double Locate::sumOfMagnitudes(int start, int end)
     }
 
     return sum;
+}
+
+// returns the distance from robot to right edge of box
+// assumes robot front facing box (forming a right degree angle)
+double Locate::getRightHypotenuse()
+{
+    double rh = lp[getBoxRightIndex(middle)];
+
+    if(rh != 0)
+    {
+        return rh;
+    }
+    return -1;
+}
+
+
+// returns the distance from robot to left edge of box
+// assumes robot front facing box (forming a right degree angle)
+double Locate::getLeftHypotenuse()
+{
+    double lh = lp[getBoxLeftIndex(middle)];
+
+    if(lh != 0)
+    {
+        return lh;
+    }
+    return -1;
+}
+
+
+// returns true if tilt detected in box's orientation
+bool Locate::didTilt(int iLeft, int iRight)
+{
+    double threshold = .2;
+    double rh = getRightHypotenuse();
+    double lh = getLeftHypotenuse();
+
+    if( rh != -1 && iRight != -1 && abs( rh - iRight ) > threshold )
+    {
+        return true;
+    }
+    else if( lh != -1 && iLeft != -1 && abs( lh - iLeft ) > threshold )
+    {
+        return true;
+    }
+
+    return false;
 }
