@@ -267,23 +267,33 @@ void Locate::wait(int n )
 }
 
 
-// wait for 'ready' message to push
+// wait for 'ready' message or 'change in box orientation' to push
 // or wait for 'end' message to stop
 bool Locate::wait4Ready()
 {
-    for(;;){
+    int rightHyp = getRightHypotenuse();
+    int leftHyp = getLeftHypotenuse();
 
-        if(d->isReady())
-        {
-            break;
-        }
-        else if(d->isSuccessful())
+    for(;;)
+    {
+        cout << "Right Mag: " << rightHyp << ", Left Mag: " << leftHyp << endl;
+
+        if(d->isSuccessful())
         {
             return true;
         }
+
+        else if(d->isReady() || didTilt(leftHyp,rightHyp))
+        {
+            break;
+        }
+
         else{
             wait(1);
         }
+
+        rightHyp = getRightHypotenuse();
+        leftHyp = getLeftHypotenuse();
     }
     return 0; // arbitrary value, never used
 }
@@ -306,6 +316,9 @@ void Locate::pushBoxAlone(int n)
 // t = iterations to push box for
 void Locate::push(int t)
 {
+    int rightHyp = getRightHypotenuse();
+    int leftHyp = getLeftHypotenuse();
+
     // ensure push defaults
     if(newturnrate != 0)
     {
@@ -323,16 +336,20 @@ void Locate::push(int t)
         robot.Read();
         pp.SetSpeed(speed, newturnrate);
 
+        cout << "Right Mag= " << rightHyp << ", Left Mag= " << leftHyp << endl;
+
         // will pause if receive error
-        if(d->isError())
+        if(d->isError() || didTilt(leftHyp,rightHyp))
         {
             over = wait4Ready();
 
-            // will exit if
+            // will exit if received End_Task signal while waiting
             if(over){
                 break;
             }
         }
+        rightHyp = getRightHypotenuse();
+        leftHyp = getLeftHypotenuse();
     }
 
     // set speed back to zero
@@ -340,6 +357,38 @@ void Locate::push(int t)
     robot.Read();
     pp.SetSpeed(speed, newturnrate);
 
+}
+
+
+// returns the distance from robot to right edge of box
+// assumes robot front facing box (forming a right degree angle)
+int Locate::getRightHypotenuse()
+{
+    return lp[getBoxRightIndex(middle)];
+}
+
+
+// returns the distance from robot to left edge of box
+// assumes robot front facing box (forming a right degree angle)
+int Locate::getLeftHypotenuse()
+{
+    return lp[getBoxLeftIndex(middle)];
+}
+
+
+// returns true if tilt detected in box's orientation
+bool Locate::didTilt(int iLeft, int iRight)
+{
+    if( abs( getRightHypotenuse() - iRight ) > .5 )
+    {
+        return true;
+    }
+    else if( abs( getLeftHypotenuse() - iLeft ) > .5 )
+    {
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -610,6 +659,7 @@ void Locate::turnLeft(int dp)
 }
 
 
+// robot adjusts to front face box perfectly perpendicularly
 // compares distances from dp -> LeftBoxIndex
 void Locate::adjustLeft(int dp)
 {
@@ -675,7 +725,7 @@ void Locate::adjustLeft(int dp)
 }
 
 
-
+// robot adjusts to front face box perfectly perpendicularly
 // compares distances from dp -> RightBoxIndex
 void Locate::adjustRight(int dp)
 {
@@ -761,7 +811,7 @@ int Locate::shortestIndex(int r, int l)
 }
 
 
-// finds right index of box
+// finds right index of box (from given index)
 int Locate::getBoxRightIndex(int index)
 {
     int rightBoxIndex = -1;
@@ -779,7 +829,7 @@ int Locate::getBoxRightIndex(int index)
     return rightBoxIndex;
 }
 
-// finds left index of box
+// finds left index of box (from given index)
 int Locate::getBoxLeftIndex(int index)
 {
     int leftBoxIndex = -1;
@@ -1111,6 +1161,7 @@ int Locate::locateBox()
 
     return index;
 }
+
 
 double Locate::sumOfMagnitudes(int start, int end)
 {

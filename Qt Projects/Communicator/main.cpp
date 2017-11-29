@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
         char ip[] = "";
         cout << "Entering DEBUG mode" << endl;
         Driver *d = new Driver(ip);
+        // Test Driver functions
     }
 
 

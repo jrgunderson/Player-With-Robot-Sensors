@@ -110,7 +110,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 
                     case 99: d->SendSuccess(); giveup = true; break;
 
-                    // else don't move
+                    // stop between each move
                     l->stop(); break;
                 }
             }
