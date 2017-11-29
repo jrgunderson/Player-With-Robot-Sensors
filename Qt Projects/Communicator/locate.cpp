@@ -137,6 +137,12 @@ void Locate::clear()
     }
 }
 
+void Locate::slow()
+{
+    robot.Read();
+    pp.SetSpeed( speed/2, newturnrate/2 );
+}
+
 void Locate::stop()
 {
     robot.Read();

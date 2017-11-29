@@ -76,53 +76,64 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
         int move;
         for(;;)
         {
-            // if recieve signal from HUB that finished task
+            l->stop();
+
+            // if recieve signal from HUB (forwarded from Robot2) that finished task
             if(d->isSuccessful())
             {
                 break;
             }
 
-            // else respond to teleoperation
-            // OR forward messages from HUB to Robot2
-            else{
+            // respond to teleoperation
+            // forward messages from HUB to Robot2
+            else
+            {
                 move = d->getMove();
-                switch( move )
+
+                // only make a move if move to be made
+                if(move != -1)
                 {
-                    // teleoperation controls
-                    case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
+                    switch( move )
+                    {
+                        // teleoperation controls
+                        case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
 
-                    case 2: l->moveBackards(); sleep(1); break;
+                        case 2: l->moveBackards(); sleep(1); break;
 
-                    case 4: l->moveLeft(); sleep(1); break;
+                        case 4: l->moveLeft(); sleep(1); break;
 
-                    case 6: l->moveRight(); sleep(1); break;
+                        case 6: l->moveRight(); sleep(1); break;
 
-                    case 8: l->moveForwards(); sleep(1); break;
+                        case 8: l->moveForwards(); sleep(1); break;
 
-                    // robot2 messages
-                    case 1: d->SendReady(); break;
+                        // robot2 messages
+                        case 1: d->SendReady(); break;
 
-                    case 9: d->Error(); break;
+                        case 9: d->Error(); break;
 
-                    case 11: d->Move(1); sleep(1); giveup = true; break;
-                    case 12: d->Move(2); sleep(1); giveup = true; break;
-                    case 13: d->Move(3); sleep(1); break;
+                        case 11: d->Move(1); sleep(1); giveup = true; break;
+                        case 12: d->Move(2); sleep(1); giveup = true; break;
+                        case 13: d->Move(3); sleep(1); break;
 
-                    case 99: d->SendSuccess(); giveup = true; break;
+                        case 99: d->SendSuccess(); giveup = true; break;
 
-                    default: l->stop(); break;
+                        default: l->stop(); break;
+                    }
+
+                    // stop between each move
+                    l->slow();
+                    move = -1;
                 }
-			 // stop between each move
-                l->stop();
             }
 
+
+            // if HUB told you task completed directly
             if(giveup){
                 break;
             }
 
-        }
+        }// end for(;;)
     }
-
 
 
 }
