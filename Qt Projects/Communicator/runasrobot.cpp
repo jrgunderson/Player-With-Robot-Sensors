@@ -10,11 +10,14 @@
 #include "runasrobot.h"
 
 char hostIP[] = "10.42.0.1";
+int port1 = 4950;
+int port2 = 4951;
 
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
 RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
 {
-    Driver *d = new Driver(ip);
+    Driver *d = new Driver(ip, port1);
+    Driver *hd = new Driver(hostIP, port2);
 
     Locate* l = new Locate(d, id, pushFor, toError);
 
@@ -30,8 +33,6 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     // if Robot2 -> switch drivers to talk to HUB
     if(id == 2)
     {
-         Driver *hd = new Driver(hostIP);
-
          // if ERROR
          if(pushesRemain > 0)
          {

@@ -197,6 +197,7 @@ int Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
+            wait(1);
             cout << "HELP! WHAT TO DO!?" << endl;
             return i; // return how many iterations there are left to push
         }

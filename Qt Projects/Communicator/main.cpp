@@ -6,8 +6,9 @@
 int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
 char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
+int port = 4950;
 
-int pushFor = 75; // number of iterations to push box for
+int pushFor = 50; // number of iterations to push box for
 bool toError = 0; // introduce error?
 
 
@@ -19,23 +20,24 @@ int main(int argc, char *argv[])
 
     if(ID == 0)
     {
-        Driver *d = new Driver(ipRight);
+        Driver *d = new Driver(ipRight, port);
+        //Driver *d = new Driver(ipLeft, port);
         runAsHub(d);
     }
 
-    else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, pushFor, toError);
-    }
-    else if(ID == 2){
-        new RunAsRobot(ID, ipRight, pushFor, toError);
-    }
+//    else if(ID == 1){
+//        new RunAsRobot(ID, ipLeft, pushFor, toError);
+//    }
+//    else if(ID == 2){
+//        new RunAsRobot(ID, ipRight, pushFor, toError);
+//    }
 
     // DEBUG
     else if(ID == 99)
     {
         char ip[] = "";
         cout << "Entering DEBUG mode" << endl;
-        Driver *d = new Driver(ip);
+        Driver *d = new Driver(ip, port);
         // Test Driver functions
     }
 

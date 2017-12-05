@@ -9,9 +9,9 @@ thread* listen_thread;
 thread* talk_thread;
 
 
-Driver::Driver(char ip[])
+Driver::Driver(char ip[], int port)
 {
-    com = new  Communicator(ip1,ip2,ip, 4950);
+    com = new  Communicator(ip1,ip2,ip, port);
 
     listen_thread = new std::thread(&Driver::Listen, this);
     sleep(1); // a quick delay to space out threads

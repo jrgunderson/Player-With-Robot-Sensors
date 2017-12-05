@@ -91,7 +91,7 @@ void Communicator::send_Start(){
     strcpy(msg, "S");
     strcat(msg, "!");
 
-    send_cmd(sfd2, msg);
+    //send_cmd(sfd2, msg);
     send_cmd(sfd3, msg);
 
 }
