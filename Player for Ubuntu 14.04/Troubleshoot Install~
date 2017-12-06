@@ -133,8 +133,8 @@ $ sudo cp <name>.so.1.0.0 /usr/local/lib
 // navigate to "home" folder -> view hidden files -> open ".bashrc" file 
 // add the folowing code to the bottom of the file -> save -> restart
 
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig
+export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 
 
