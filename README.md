@@ -20,7 +20,7 @@ ________________________________________________________________________________
 	- Confirm that library path was added to your .bashrc file
 	  1) navigate to "home" folder -> view hidden files -> open ".bashrc" file 
 	  2) add the folowing code to the bottom of the file -> save -> restart
-		export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig
+		export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH
 		export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 
