@@ -10,10 +10,13 @@
 #define H 0 // used in help
 #define R 1 // used in request
 
+char *ip_addr1;
+char *ip_addr2;
+char *ip_addr3;
 
-char *ip_addr;
-int sfd;
-int lfd;
+int sfd1; //Robot
+int sfd2; //Other Robot or Phone
+int sfd3; //Desktop
 
 bool toStart;
 bool isReady;
@@ -21,6 +24,8 @@ bool isError;
 bool needHelp;
 bool isSuccessful;
 int this_move;
+
+int lfd;
 
 extern "C"{
     int itoa(int n, char s[]);
@@ -30,13 +35,18 @@ extern "C"{
     int Communicator_to_one(int sockfd, char *msg, int);
     int talk_to_one(int sockfd, char *msg, int);
 }
-Communicator::Communicator(char *ip, int p)
+Communicator::Communicator(char * ip1,char * ip2,char * ip3, int p)
 {
     port = p;
 
-    ip_addr = ip;
+    ip_addr1 = ip1;
+    ip_addr2 = ip2;
+    ip_addr3 = ip3;
 
-    cout << ip_addr << ", " << port << " \n";
+    //int bfd = create_broadcast(6665, H); // broadcast fd
+    sfd1 = create_send(ip_addr1, port, H); // single fd #3
+    sfd2 = create_send(ip_addr2, port, H); // single fd #4
+    sfd3 = create_send(ip_addr3, port, H); // single fd #4
 }
 
 //For Robot
@@ -67,7 +77,7 @@ void Communicator::send_Bid(int rn, int str, int dist){
     strcat(msg, char_dist);
     strcat(msg, "!");
 
-    send_cmd(sfd, msg);
+    send_cmd(sfd2, msg);
 }
 
 
@@ -81,7 +91,8 @@ void Communicator::send_Start(){
     strcpy(msg, "S");
     strcat(msg, "!");
 
-    send_cmd(sfd, msg);
+    send_cmd(sfd2, msg);
+    send_cmd(sfd3, msg);
 
 }
 
@@ -101,7 +112,8 @@ void Communicator::send_Task(){
     strcpy(msg, "T");
     strcat(msg, "!");
 
-    send_cmd(sfd,msg);
+    send_cmd(sfd1,msg);
+    send_cmd(sfd2,msg);
 }
 
 
@@ -115,7 +127,7 @@ void Communicator::send_Ready(){
 
     strcpy(msg, "R");
     strcat(msg, "!");
-    send_cmd(sfd,msg);
+    send_cmd(sfd3,msg);
 }
 
 bool Communicator::getReady()
@@ -136,7 +148,9 @@ void Communicator::send_Error(char *emsg){
     strcat(msg, emsg);
     strcat(msg, "!");
 
-    send_cmd(sfd, msg);
+//    send_cmd(sfd1, msg);
+//    send_cmd(sfd2, msg);
+    send_cmd(sfd3, msg);
 }
 
 
@@ -155,7 +169,9 @@ void Communicator::send_Help(){
     strcpy(msg, "H");
     strcat(msg, "!");
 
-    send_cmd(sfd,msg);
+//    send_cmd(sfd1,msg);
+//    send_cmd(sfd2,msg);
+    send_cmd(sfd3,msg);
 }
 
 
@@ -175,7 +191,7 @@ void Communicator::send_Success(){
 
     strcpy(msg, "X");
     strcat(msg, "!");
-    send_cmd(sfd,msg);
+    send_cmd(sfd3,msg);
 }
 
 bool Communicator::getSuccess()
@@ -198,7 +214,7 @@ void Communicator::send_Move(int i){
     strcat(msg, &c);
     strcat(msg, "!");
 
-    send_cmd(sfd,msg);
+    send_cmd(sfd3,msg);
 }
 
 int Communicator::getMove()
@@ -315,10 +331,5 @@ void Communicator::startListen(){
         parse_msg(msg);
         sleep(3);
     }
-}
-
-void Communicator::startSpeak(){
-
-    sfd = create_send(ip_addr, port, H);
 }
 

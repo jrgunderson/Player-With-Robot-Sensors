@@ -18,7 +18,7 @@ class Communicator : public QObject
     Q_OBJECT
 
 public:
-    Communicator(char *ip, int p);
+    Communicator(char * ip1,char * ip2,char * ip3, int p);
     void send_cmd(int sfd, char *msg);
     void parse_msg(char *msg);
     void send_Bid(int rn, int str, int dist);
@@ -50,7 +50,6 @@ signals:
     void successReceived();
 public slots:
     void startListen();
-    void startSpeak();
 };
 
 #endif // COMMUNICATOR_H

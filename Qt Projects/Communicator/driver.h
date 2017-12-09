@@ -12,9 +12,8 @@ using namespace std;
 class Driver
 {
     public:
-        explicit Driver(char ip[], int port);
+        explicit Driver(char ip[]);
         void Listen();
-        void Speak();
         void SendStart();
         void SendReady();
         void SendHelp();
