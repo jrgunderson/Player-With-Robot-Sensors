@@ -71,14 +71,20 @@ RunAsRobot::RunAsRobot(int id, Channel *c, int pushFor, bool toError)
         int move;
         for(;;)
         {
+<<<<<<< HEAD
             l->stop();
 
             // if recieve signal from HUB (forwarded from Robot2) that finished task
             if(c->d2->isSuccessful())
+=======
+            // if recieve signal from HUB that finished task
+            if(d->isSuccessful())
+>>>>>>> parent of 1ec9d69... minor tweaks to teleop -> need to test
             {
                 break;
             }
 
+<<<<<<< HEAD
             // respond to teleoperation
             // forward messages from HUB to Robot2
             else
@@ -92,15 +98,26 @@ RunAsRobot::RunAsRobot(int id, Channel *c, int pushFor, bool toError)
                     {
                         // teleoperation controls
                         case 0: l->stop(); c->d2->Error(); break; // to stop and have other robot stop with you
+=======
+            // else respond to teleoperation
+            // OR forward messages from HUB to Robot2
+            else{
+                move = d->getMove();
+                switch( move )
+                {
+                    // teleoperation controls
+                    case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
+>>>>>>> parent of 1ec9d69... minor tweaks to teleop -> need to test
 
-                        case 2: l->moveBackards(); sleep(1); break;
+                    case 2: l->moveBackards(); sleep(1); break;
 
-                        case 4: l->moveLeft(); sleep(1); break;
+                    case 4: l->moveLeft(); sleep(1); break;
 
-                        case 6: l->moveRight(); sleep(1); break;
+                    case 6: l->moveRight(); sleep(1); break;
 
-                        case 8: l->moveForwards(); sleep(1); break;
+                    case 8: l->moveForwards(); sleep(1); break;
 
+<<<<<<< HEAD
                         // robot2 messages
                         case 1: c->d2->SendReady(); break;
 
@@ -111,24 +128,32 @@ RunAsRobot::RunAsRobot(int id, Channel *c, int pushFor, bool toError)
                         case 13: c->d2->Move(3); sleep(1); break;
 
                         case 99: c->d2->SendSuccess(); giveup = true; break;
+=======
+                    // robot2 messages
+                    case 1: d->SendReady(); break;
 
-                        default: l->stop(); break;
-                    }
+                    case 9: d->Error(); break;
 
-                    // stop between each move
-                    l->slow();
-                    move = -1;
+                    case 11: d->Move(1); sleep(1); giveup = true; break;
+                    case 12: d->Move(2); sleep(1); giveup = true; break;
+                    case 13: d->Move(3); sleep(1); break;
+
+                    case 99: d->SendSuccess(); giveup = true; break;
+>>>>>>> parent of 1ec9d69... minor tweaks to teleop -> need to test
+
+                    default: l->stop(); break;
                 }
+			 // stop between each move
+                l->stop();
             }
 
-
-            // if HUB told you task completed directly
             if(giveup){
                 break;
             }
 
-        }// end for(;;)
+        }
     }
+
 
 
 }
