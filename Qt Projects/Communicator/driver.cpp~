@@ -1,6 +1,5 @@
-// wraps communicator into a thread
-
 #include "driver.h"
+
 
 Communicator* com;
 thread* listen_thread;

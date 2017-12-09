@@ -36,7 +36,7 @@ Communicator::Communicator(char *ip, int p)
 
     ip_addr = ip;
 
-    cout << ip_addr << ", " << port << " \n";
+    cout << ip_addr << ", " << port ;
 
     sfd = create_send(ip_addr, port, H);
 }
