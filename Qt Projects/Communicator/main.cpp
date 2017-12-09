@@ -1,43 +1,39 @@
+// change IP addresses in "drivers.cpp"
 
-#include "driver.h"
+
+#include "channel.h"
 #include <string>
 #include "runasrobot.h"
 
 int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
-char ipRight[] = "10.42.0.42"; // IP address for Robot1
-char ipLeft[] = "10.42.0.11"; // IP address for Robot2
-int port = 4950;
 
 int pushFor = 50; // number of iterations to push box for
 bool toError = 0; // introduce error?
 
 
-void runAsHub(Driver *d);
+void runAsHub(Channel *c);
 
 
 int main(int argc, char *argv[])
 {
+    Channel *c = new Channel(ID);
 
     if(ID == 0)
     {
-        Driver *d = new Driver(ipRight, port);
-        //Driver *d = new Driver(ipLeft, port);
-        runAsHub(d);
+        runAsHub(c);
     }
 
     else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, pushFor, toError);
+        RunAsRobot(ID, c, pushFor, toError);
     }
     else if(ID == 2){
-        new RunAsRobot(ID, ipRight, pushFor, toError);
+        RunAsRobot(ID, c, pushFor, toError);
     }
 
     // DEBUG
     else if(ID == 99)
     {
-        char ip[] = "";
         cout << "Entering DEBUG mode" << endl;
-        Driver *d = new Driver(ip, port);
         // Test Driver functions
     }
 
@@ -46,13 +42,13 @@ int main(int argc, char *argv[])
 
 // State Machine for HUB
 // HUB must NOT change drivers -> all communications to Robot2 must be relayed Robot1
-void runAsHub(Driver *d)
+void runAsHub(Channel *c)
 {
 
     int todo;
     cout << "Press [1] when ready to commence trials" << endl;
     cin >>  todo;
-    d->SendStart(); // tell robot1 to start
+    c->d1->SendStart(); // tell robot1 to start
     cout << "Let the trials begin!" << endl;
 
 
@@ -60,14 +56,14 @@ void runAsHub(Driver *d)
     bool taskComplete= false;
     for(;;)
     {           
-        if(d->needHelp())
+        if(c->d1->needHelp())
         {
             cout << "Robot2 Needs Help!\n 1=push straight, 2=push alone, 3=teleoperate Robot1" << endl;
 
             // tell robot2 how to continue
             cin >>  todo;
             todo += 10; // convert to format for Robot1 to pass message to Robot2
-            d->Move(todo);
+            c->d2->Move(todo);
 
 
             // if teleoperating Robot1
@@ -76,7 +72,7 @@ void runAsHub(Driver *d)
                  cout << "0=stop, 2=reverse, 4=left, 6=right, 8=forward,\n1=SendReady, 9=SendError, 99=TaskComplete" << endl;
                  for(;;){
                      cin >>  todo;
-                     d->Move(todo);
+                     c->d1->Move(todo);
 
                      if(todo == 99){
                          taskComplete = true;
@@ -89,10 +85,10 @@ void runAsHub(Driver *d)
         }
 
         // if Robot2 told me task complete
-        else if(d->isSuccessful())
+        else if(c->d2->isSuccessful())
         {
             cout << "! TASK COMPLETE !" << endl;
-            d->SendSuccess(); // tell robot1 to stand down
+            c->d1->SendSuccess(); // tell robot1 to stand down
             break;
         }
 
