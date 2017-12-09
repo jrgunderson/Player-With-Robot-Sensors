@@ -11,10 +11,11 @@ Driver::Driver(char ip[], int port)
 {
     com = new  Communicator(ip, port);
 
-    listen_thread = new std::thread(&Driver::Listen, this);
+    talk_thread = new std::thread(&Driver::Speak, this);
+
     sleep(1); // a quick delay to space out threads
 
-    talk_thread = new std::thread();
+    listen_thread = new std::thread(&Driver::Listen, this);
 }
 
 
@@ -28,6 +29,11 @@ void Driver::Close()
 void Driver::Listen()
 {
     com->startListen();
+}
+
+void Driver::Speak()
+{
+    com->startSpeak();
 }
 
 

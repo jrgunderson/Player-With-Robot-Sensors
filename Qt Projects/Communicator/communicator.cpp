@@ -37,8 +37,6 @@ Communicator::Communicator(char *ip, int p)
     ip_addr = ip;
 
     cout << ip_addr << ", " << port << " \n";
-
-    sfd = create_send(ip_addr, port, H);
 }
 
 //For Robot
@@ -317,5 +315,10 @@ void Communicator::startListen(){
         parse_msg(msg);
         sleep(3);
     }
+}
+
+void Communicator::startSpeak(){
+
+    sfd = create_send(ip_addr, port, H);
 }
 

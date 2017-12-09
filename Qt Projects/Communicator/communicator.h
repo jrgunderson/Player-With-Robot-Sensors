@@ -50,6 +50,7 @@ signals:
     void successReceived();
 public slots:
     void startListen();
+    void startSpeak();
 };
 
 #endif // COMMUNICATOR_H
