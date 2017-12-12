@@ -24,12 +24,12 @@ int main(int argc, char *argv[])
         runAsHub(d);
     }
 
-//    else if(ID == 1){
-//        new RunAsRobot(ID, ipLeft, pushFor);
-//    }
-//    else if(ID == 2){
-//        new RunAsRobot(ID, ipRight, pushFor);
-//    }
+    else if(ID == 1){
+        new RunAsRobot(ID, ipLeft, pushFor);
+    }
+    else if(ID == 2){
+        new RunAsRobot(ID, ipRight, pushFor);
+    }
 
     // DEBUG
     else if(ID == 99)
