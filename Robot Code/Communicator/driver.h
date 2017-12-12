@@ -14,6 +14,7 @@ class Driver
     public:
         explicit Driver(char ip[]);
         void Listen();
+        void Speak();
         void SendStart();
         void SendReady();
         void SendHelp();

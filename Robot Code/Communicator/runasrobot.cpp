@@ -31,6 +31,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     if(id == 2)
     {
          Driver *hd = new Driver(hostIP);
+         sleep(2);
 
          // if ERROR
          if(pushesRemain > 0)

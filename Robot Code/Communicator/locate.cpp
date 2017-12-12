@@ -231,8 +231,9 @@ int Locate::pushRight(int n)
 
         // introduce error 1/2 into pushing
         if(toError){
-            if(i <= n/2){
-			 d->Error();
+            if(i <= n/2)
+            {
+                d->Error();
                 introduceError();
                 return i;
             }

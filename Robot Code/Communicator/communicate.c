@@ -66,7 +66,7 @@ int create_listen(int portnum, int index)
     }
 
     return fd;
-}	
+}
 
 /*
  * Create a UDP socket to send messages to others
