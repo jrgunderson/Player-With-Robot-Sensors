@@ -16,6 +16,7 @@ int sfd;
 int lfd;
 
 bool toStart;
+bool startBroken;
 bool isReady;
 bool isError;
 bool needHelp;
@@ -72,13 +73,15 @@ void Communicator::send_Bid(int rn, int str, int dist){
 
 
 //For Desktop
-void Communicator::send_Start(){
+void Communicator::send_Start(int e){
     // create a message
     char *msg = NULL;
+    char &c = to_string(e)[0];
 
     msg = (char *) malloc(60*sizeof(char));
 
     strcpy(msg, "S");
+    strcat(msg, &c);
     strcat(msg, "!");
 
     send_cmd(sfd, msg);
@@ -88,6 +91,10 @@ void Communicator::send_Start(){
 bool Communicator::getStart()
 {
     return toStart;
+}
+bool Communicator::errorStart()
+{
+    return startBroken;
 }
 
 
@@ -250,8 +257,10 @@ void Communicator::parse_msg(char *msg){
             emit(taskReceived());
         }
         else if ((token[0] == 'S')) {
-            toStart = true;
             printf("This is a S type of message\n");
+            ptr = strstr(token, "$");
+            toStart = true;
+            startBroken = atoi(ptr);
             token = NULL;
             sleep(1);
             emit(startReceived());

@@ -15,7 +15,7 @@ class Driver
         explicit Driver(char ip[]);
         void Listen();
         void Speak();
-        void SendStart();
+        void SendStart(bool e);
         void SendReady();
         void SendHelp();
         void Error();
@@ -24,6 +24,7 @@ class Driver
         int getMove();
         void Close();
         bool toStart();
+        bool startBroken();
         bool isReady();
         bool isError();
         bool needHelp();

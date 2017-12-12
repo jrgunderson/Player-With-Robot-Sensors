@@ -29,12 +29,12 @@ time_t timer;
 const int YES = 0;
 
 // constructor
-Locate::Locate(Driver* driver, int id, int pushfor, bool e)
+Locate::Locate(Driver* driver, int id, int pushfor)
 {
     ID = id;
     d = driver;
     pushFor = pushfor;
-    toError = e;
+    toError = 0;
 }
 
 // start full autonomous mode
@@ -184,7 +184,7 @@ int Locate::pushLeft(int n)
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
     d->SendReady(); // send that you're ready to push!
-    wait(.5); // wait for other robot to react real quick
+    wait4ready(); // wait for other robot to acknowledge it is ready
 
 
     // finally start pushing
@@ -197,6 +197,7 @@ int Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
+		  wait(1);
             cout << "HELP! WHAT TO DO!?" << endl;
             return i; // return how many iterations there are left to push
         }
@@ -218,9 +219,8 @@ int Locate::pushRight(int n)
 
     std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
 
-    // wait for ready message from other robot to push
-    wait4ready();
-
+    wait4ready(); // wait for ready message from other robot to push
+    d->SendReady(); // tell other robot you received their ready message
 
     // finally start pushing
     for(int i=n; i>=0; --i)
@@ -279,7 +279,6 @@ void Locate::wait(int n )
 // or wait for 'end' message to stop
 bool Locate::wait4ready()
 {
-
     for(;;)
     {
         if(d->isSuccessful())
@@ -296,7 +295,8 @@ bool Locate::wait4ready()
             wait(1);
         }
     }
-    return 0; // arbitrary value, never used
+
+    return false;
 }
 
 // do nothing until start signal recieved
@@ -307,6 +307,7 @@ void Locate::wait2start()
 
         if( d->toStart() )
         {
+            toError = d->startBroken();
             break;
         }
 
@@ -379,9 +380,11 @@ void Locate::goToRightSide()
     turnRight(middle);
     adjustRight(left);
 
-    if(ID == 1){
-            d->SendStart(); // tell other robot it can start
-    }
+    // tell other robot it can start
+    if(ID == 1)
+    {
+        d->SendStart(toError); // actually doesn't matter if
+    }                          // other robot knows if error will be introduced
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up

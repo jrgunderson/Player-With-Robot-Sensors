@@ -37,9 +37,9 @@ void Driver::Speak()
 }
 
 
-void Driver::SendStart()
+void Driver::SendStart(bool e)
 {
-    com->send_Start();
+    com->send_Start(e);
 }
 
 void Driver::SendReady()
@@ -77,6 +77,11 @@ int Driver::getMove()
 bool Driver::toStart()
 {
     return com->getStart();
+}
+
+bool Driver::startBroken()
+{
+    return com->errorStart();
 }
 
 bool Driver::isReady()

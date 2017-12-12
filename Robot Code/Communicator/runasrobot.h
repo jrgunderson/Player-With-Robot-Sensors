@@ -6,7 +6,7 @@
 class RunAsRobot
 {
 public:
-    RunAsRobot(int id, char ip[], int pushFor, bool toError);
+    RunAsRobot(int id, char ip[], int pushFor);
 };
 
 #endif // RUNASROBOT_H

@@ -20,7 +20,7 @@ public:
     int rightEye = -1;
     int leftEye = -1;
 
-    Locate(Driver* driver, int id, int pushfor, bool e);
+    Locate(Driver* driver, int id, int pushfor);
     int run();
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);

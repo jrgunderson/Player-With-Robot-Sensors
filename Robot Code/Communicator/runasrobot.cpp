@@ -12,11 +12,11 @@
 char hostIP[] = "10.42.0.1";
 
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
-RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
+RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 {
     Driver *d = new Driver(ip);
 
-    Locate* l = new Locate(d, id, pushFor, toError);
+    Locate* l = new Locate(d, id, pushFor);
 
     // wait to start
     if(id==1){
@@ -31,7 +31,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
     if(id == 2)
     {
          Driver *hd = new Driver(hostIP);
-         sleep(2);
+	    sleep(2);
 
          // if ERROR
          if(pushesRemain > 0)
@@ -122,7 +122,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor, bool toError)
                     }
 
                     // stop between each move
-                    l->slow();
+                    l->stop();
                     move = -1;
                 }
             }

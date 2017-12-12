@@ -25,12 +25,13 @@ public:
     void send_Ready();
     void send_Help();
     void send_Task();
-    void send_Start();
+    void send_Start(int e);
     void send_Success();
     void send_Error(char *emsg);
     void send_Move(int i);
     int getMove();
     bool getStart();
+    bool errorStart();
     bool getReady();
     bool getError();
     bool getHelp();
