@@ -3,22 +3,22 @@
  *
  * Robot1 = Right Robot
  * Robot2 = Left Robot
- *
- * toError = Robot1 stops
 */
 
 #include "runasrobot.h"
 
 char hostIP[] = "10.42.0.1";
 
+
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
 RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 {
     Driver *d = new Driver(ip);
-    Locate* l = new Locate(d, id, pushFor);
+    Locate *l = new Locate(d, id, pushFor);
 
     // wait to start
-    if(id==1){
+    if(id==1)
+    {
         cout << "waiting to start" << endl;
         l->wait2start();
     }
@@ -58,7 +58,8 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                          if(stopPushing){
                              pushesRemain = 0;
                          }else{
-                             l->push(pushesRemain);
+                             l->push(100); // push count arbitrary cuz robot2 will stop when robot1 stops
+                             pushesRemain = 0;
                          }
 
                      break;
@@ -82,8 +83,6 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
         int move;
         for(;;)
         {
-            l->stop();
-
             // if recieve signal from HUB (forwarded from Robot2) that finished task
             if(d->isSuccessful())
             {
@@ -102,20 +101,24 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                     switch( move )
                     {
                         // teleoperation controls
-                        case 0: l->stop(); d->Error(); break; // to stop and have other robot stop with you
+                        //      about 4 move<turn>s = 90 degree turn
 
-                        case 2: l->moveBackards(); sleep(1); break;
+                        case 2: l->moveBackards(); l->slow(); sleep(1); break;
+                        case 22: l->moveBackards(); l->slow(); sleep(2); break; // long Reverse
+                        case 222: l->moveBackards(); l->slow(); sleep(4); break; // longer Reverse
 
                         case 4: l->moveLeft(); sleep(1); break;
+                        case 44: l->moveLeft(); sleep(4); break; // long Left turn
 
                         case 6: l->moveRight(); sleep(1); break;
+                        case 66: l->moveRight(); sleep(4); break; // long Right turn
 
                         case 8: l->moveForwards(); sleep(1); break;
+                        case 88: l->moveForwards(); sleep(2); break; // long Forward
+                        case 888: l->moveForwards(); sleep(4); break; // longer Forward
 
-                        // robot2 messages
+                        // messages forwarded to Robot2
                         case 1: d->SendReady(); l->push(pushesRemain); break;
-
-                        case 9: d->Error(); break;
 
                         case 11: d->Move(1); sleep(1); giveup = true; break;
                         case 12: d->Move(2); sleep(1); giveup = true; break;
@@ -123,11 +126,12 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 
                         case 99: d->SendSuccess(); giveup = true; break;
 
-                        default: l->stop(); break;
+                        default: l->stop(); d->Error(); break;
                     }
 
-                    // stop between each move
+                    // stop between each move && make sure other robot stops as well
                     l->stop();
+                    d->Error();
                     d->setMove(-1);
                 }
             }

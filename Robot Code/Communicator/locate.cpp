@@ -140,37 +140,47 @@ void Locate::clear()
 void Locate::slow()
 {
     robot.Read();
-    pp.SetSpeed( speed/2, newturnrate/2 );
+    pp.SetSpeed( speed*(4/5.0), newturnrate*(4/5.0) );
 }
 
 void Locate::stop()
 {
+    speed = 0.0;
+    newturnrate = 0.0;
     robot.Read();
-    pp.SetSpeed(0.0, 0.0);
+    pp.SetSpeed(speed, newturnrate);
 }
 
 void Locate::moveBackards()
 {
+    speed = -cap;
+    newturnrate = 0.0;
     robot.Read();
-    pp.SetSpeed(-cap/2, 0.0);
+    pp.SetSpeed(speed, newturnrate);
 }
 
 void Locate::moveForwards()
 {
+    speed = cap;
+    newturnrate = 0.0;
     robot.Read();
-    pp.SetSpeed(cap/2, 0.0);
+    pp.SetSpeed(speed, newturnrate);
 }
 
 void Locate::moveRight()
 {
+    speed = 0.0;
+    newturnrate = -cap;
     robot.Read();
-    pp.SetSpeed(0.0, -cap);
+    pp.SetSpeed(speed, newturnrate);
 }
 
 void Locate::moveLeft()
 {
+    speed = 0.0;
+    newturnrate = cap;
     robot.Read();
-    pp.SetSpeed(0.0, cap);
+    pp.SetSpeed(speed, newturnrate);
 }
 
 
@@ -860,8 +870,9 @@ int Locate::getBoxSize( int index)
 }
 
 
-// algorithm to move away from walls but towards a box
-// until box within certain range
+// Autonomously move away from walls but towards a box
+//      starts slow, but speed increases as it approaches box
+// ..Until box within certain range
 int Locate::avoidWalls()
 {
     // initialize variables
@@ -939,6 +950,95 @@ int Locate::avoidWalls()
 }
 
 
+// Autonomously locates box (slows down as it approaches)
+int Locate::locateBox()
+{
+    // initialize variables
+    int index = -1;
+    int boxSize = scanPoints;
+
+    for(;;)
+    {
+        robot.Read();
+
+        // locate corner of nearest obstacle (presumably a box)
+        index = shortestIndex(rightEye, leftEye);
+        double minObjDist = lp[index];
+
+        std::cout << "\nCorner index " << index << " @ dist: " << minObjDist << std::endl;
+
+        boxSize = getBoxSize(index);
+        index = getMiddleIndex(index);
+
+        // slow down as robot aproaches box
+        double newSpeed = std::pow(minObjDist,2);
+
+        if(newSpeed < speed)
+        {
+            speed = newSpeed;
+        }
+        else if( newSpeed < cap )
+        {
+            speed = cap;
+        }
+
+
+        // turn the robot until front facing middle of box
+        // turn rate increases as it gets closer to object
+        if( index > middle ) // if left of center
+        {
+            newturnrate = 1/(6*minObjDist); // turn left
+
+        }
+        else if( index < middle ) // if right of center
+        {
+            newturnrate = -1/(6*minObjDist); // turn right
+        }
+        else{
+            newturnrate = 0;
+        }
+
+
+        // cap turnrate
+        if( newturnrate > cap )
+        {
+            newturnrate = cap;
+        }
+        if( newturnrate < -cap )
+        {
+            newturnrate = -cap;
+        }
+
+
+        std::cout << "Size of Box: " << boxSize
+                << ", Middle index: "<< index << std::endl;
+
+        std::cout << "speed: " << speed
+                  << " turn: " << newturnrate
+                  << std::endl;
+
+
+
+        // write commands to robot
+        pp.SetSpeed(speed, newturnrate);
+
+
+        // stop scanning once finite object a reached certain distance
+        if( minObjDist <= minDist )
+        {
+            std::cout << "I FOUND CENTER OF BOX!\n" << std::endl;
+            speed = 0;  // newturnrate = -newturnrate;
+            robot.Read();
+            pp.SetSpeed(speed, newturnrate);
+            break;
+        }
+    }
+
+    return index;
+}
+
+
+// FOR SMALL BOXES
 // move towards box but overshoot center of box by a little
 // so when robot turns to face box it is exactly at center
 int Locate::locateBoxOffset()
@@ -1054,94 +1154,6 @@ int Locate::locateBoxOffset()
         }
 
     } // end think-read-react loop 2
-
-    return index;
-}
-
-
-// just a basic algorithm to move towards box
-int Locate::locateBox()
-{
-    // initialize variables
-    int index = -1;
-    int boxSize = scanPoints;
-
-    for(;;)
-    {
-        robot.Read();
-
-        // locate corner of nearest obstacle (presumably a box)
-        index = shortestIndex(rightEye, leftEye);
-        double minObjDist = lp[index];
-
-        std::cout << "\nCorner index " << index << " @ dist: " << minObjDist << std::endl;
-
-        boxSize = getBoxSize(index);
-        index = getMiddleIndex(index);
-
-        // slow down as robot aproaches box
-        double newSpeed = std::pow(minObjDist,2);
-
-        if(newSpeed < speed)
-        {
-            speed = newSpeed;
-        }
-        else if( newSpeed < cap )
-        {
-            speed = cap;
-        }
-
-
-        // turn the robot until front facing middle of box
-        // turn rate increases as it gets closer to object
-        if( index > middle ) // if left of center
-        {
-            newturnrate = 1/(6*minObjDist); // turn left
-
-        }
-        else if( index < middle ) // if right of center
-        {
-            newturnrate = -1/(6*minObjDist); // turn right
-        }
-        else{
-            newturnrate = 0;
-        }
-
-
-        // cap turnrate
-        if( newturnrate > cap )
-        {
-            newturnrate = cap;
-        }
-        if( newturnrate < -cap )
-        {
-            newturnrate = -cap;
-        }
-
-
-        std::cout << "Size of Box: " << boxSize
-                << ", Middle index: "<< index << std::endl;
-
-        std::cout << "speed: " << speed
-                  << " turn: " << newturnrate
-                  << std::endl;
-
-
-
-        // write commands to robot
-        pp.SetSpeed(speed, newturnrate);
-
-
-        // stop scanning once finite object a reached certain distance
-        if( minObjDist <= minDist )
-        {
-            std::cout << "I FOUND CENTER OF BOX!\n" << std::endl;
-            speed = 0;  // newturnrate = -newturnrate;
-            robot.Read();
-            pp.SetSpeed(speed, newturnrate);
-            break;
-        }
-    }
 
     return index;
 }

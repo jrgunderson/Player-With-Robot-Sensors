@@ -63,7 +63,7 @@ public:
 private:
 
     double cap = .2;
-    double speed = .35;  // in meters per second
+    double speed = cap;  // in meters per second
     double newturnrate = 0; // in radians per seconds
     double minDist = .19;  // distance robot should stop in front of box
     double minRadius = .75; // distance when robot clears walls and has def located box
