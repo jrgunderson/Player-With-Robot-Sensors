@@ -58,7 +58,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                          if(stopPushing){
                              pushesRemain = 0;
                          }else{
-                             l->push(100); // arbitrary push count cuz robot2 will stop when robot1 stops
+                             l->push(100); // push count arbitrary cuz robot2 will stop when robot1 stops
                              pushesRemain = 0;
                          }
 
