@@ -145,10 +145,10 @@ void Locate::slow()
 
 void Locate::stop()
 {
+    robot.Read();
+    pp.SetSpeed(0.0, 0.0);
     speed = 0.0;
     newturnrate = 0.0;
-    robot.Read();
-    pp.SetSpeed(speed, newturnrate);
 }
 
 void Locate::moveBackards()
@@ -214,7 +214,6 @@ int Locate::pushLeft(int n)
 
     }
 
-    stop();
     return YES;
 }
 
@@ -286,8 +285,8 @@ void Locate::wait(int n )
 }
 
 
-// wait for 'ready' message or 'change in box orientation' to push
-// or wait for 'end' message to stop
+// wait for 'ready' or 'end' message
+// returns true if ending_trial
 bool Locate::wait4ready()
 {
     for(;;)
@@ -299,7 +298,7 @@ bool Locate::wait4ready()
 
         else if( d->isReady() )
         {
-            break;
+            return false;
         }
 
         else{
@@ -343,7 +342,8 @@ void Locate::pushBoxAlone(int n)
 
 
 // t = iterations to push box for
-void Locate::push(int t)
+// returns iterations remaining if interrupted
+int Locate::push(int t)
 {
 
     // ensure push defaults
@@ -358,7 +358,7 @@ void Locate::push(int t)
 
     // push
     bool over = false;
-    for(int i=0; i<t; ++i)
+    for(int i=t; i>=0; --i)
     {
         robot.Read();
         pp.SetSpeed(speed, newturnrate);
@@ -371,7 +371,7 @@ void Locate::push(int t)
 
             // will exit if received End_Task signal while waiting
             if(over){
-                break;
+                return i;
             }
         }
     }
@@ -381,7 +381,8 @@ void Locate::push(int t)
     robot.Read();
     pp.SetSpeed(speed, newturnrate);
 
-}\
+    return 0;
+}
 
 
 // send robot to right side of box

@@ -249,8 +249,8 @@ void Communicator::parse_msg(char *msg){
             emit(bidReceived(id,str,d));
         }
         else if ((token[0] == 'R')) {
-            printf("This is a R type of message\n");
             isReady = true;
+            printf("This is a R type of message\n");
             token = NULL;
             emit(startReceived());
             sleep(1);
@@ -280,10 +280,11 @@ void Communicator::parse_msg(char *msg){
             sleep(1);
         }
         else if ((token[0] == 'M')) {
-            printf("This is a M type of message\n");
             ptr = strstr(token, "$");
             ptr++;
             this_move = atoi(ptr);
+
+            printf("This is a M type of message\n");
             token = NULL;
             emit(moveReceived(this_move));
             sleep(1);

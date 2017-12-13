@@ -28,14 +28,16 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
     // if Robot2 -> switch drivers to talk to HUB
     if(id == 2)
     {
-         d = new Driver(hostIP);
-         l = new Locate(d, id, pushesRemain);
-
+         // create new talk thread - BUT keep old listen thread
+         Driver *hd = new Driver(hostIP);
 
          // if ERROR
          if(pushesRemain > 0)
          {
-             d->SendHelp();
+             hd->SendHelp();
+
+             pushesRemain +=11; // this robot will always need to catch-up
+             cout << pushesRemain << endl;
 
              // wait for HUB to tell you what to do
              int move;
@@ -46,7 +48,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                  switch( move )
                  {
                      // just push box straight
-                     case 1: l->push(pushesRemain); pushesRemain =0; break;
+                     case 1: pushesRemain = l->push(pushesRemain); break;
 
                      // push box alone (number of times to push each side)
                      case 2: l->pushBoxAlone(3); pushesRemain =0; break;
@@ -58,8 +60,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                          if(stopPushing){
                              pushesRemain = 0;
                          }else{
-                             l->push(100); // arbitrary push count cuz robot2 will stop when robot1 stops
-                             pushesRemain = 0;
+                             pushesRemain = l->push(pushesRemain);
                          }
 
                      break;
@@ -71,15 +72,16 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
          }
 
          // tell HUB task is complete
-         d->SendSuccess();
+         hd->SendSuccess();
     }
 
     // Robot1 do this...
     else
     {
-        bool giveup = false;
+        cout << pushesRemain << endl;
 
         // Regardless if ERROR or not...
+        bool giveup = false;
         int move;
         for(;;)
         {
@@ -131,7 +133,6 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 
                     // stop between each move && make sure other robot stops as well
                     l->stop();
-                    d->Error();
                     d->setMove(-1);
                 }
             }

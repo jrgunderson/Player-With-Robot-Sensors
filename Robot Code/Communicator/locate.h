@@ -40,7 +40,7 @@ public:
     int pushRight(int n);
     int pushLeft(int n);
     void pushBoxAlone(int n);
-    void push(int t);
+    int push(int t);
     int avoidWalls();
     int locateBoxOffset();
     int locateBox();
