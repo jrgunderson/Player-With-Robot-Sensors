@@ -15,7 +15,6 @@ char hostIP[] = "10.42.0.1";
 RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 {
     Driver *d = new Driver(ip);
-
     Locate* l = new Locate(d, id, pushFor);
 
     // wait to start
@@ -26,23 +25,24 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 
     int pushesRemain = l->run();
 
-
     // if Robot2 -> switch drivers to talk to HUB
     if(id == 2)
     {
-         Driver *hd = new Driver(hostIP);
-	    sleep(2);
+         d = new Driver(hostIP);
+         l = new Locate(d, id, pushesRemain);
+
 
          // if ERROR
          if(pushesRemain > 0)
          {
-             hd->SendHelp();
+             d->SendHelp();
 
              // wait for HUB to tell you what to do
              int move;
              for(;;)
              {
-                 move = hd->getMove();
+                 move = d->getMove();
+
                  switch( move )
                  {
                      // just push box straight
@@ -53,9 +53,14 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 
                      // wait for teleoperate to send signal
                      case 3:
-                         l->wait4ready();
-                         l->push(100);     // arbitrary push count,
-                         pushesRemain = 0; // robot stops pushing when told to
+                         bool stopPushing = l->wait4ready();
+
+                         if(stopPushing){
+                             pushesRemain = 0;
+                         }else{
+                             l->push(pushesRemain);
+                         }
+
                      break;
                  }
                  if(pushesRemain == 0){
@@ -65,7 +70,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
          }
 
          // tell HUB task is complete
-         hd->SendSuccess();
+         d->SendSuccess();
     }
 
     // Robot1 do this...
@@ -108,7 +113,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
                         case 8: l->moveForwards(); sleep(1); break;
 
                         // robot2 messages
-                        case 1: d->SendReady(); break;
+                        case 1: d->SendReady(); l->push(pushesRemain); break;
 
                         case 9: d->Error(); break;
 
@@ -123,7 +128,7 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
 
                     // stop between each move
                     l->stop();
-                    move = -1;
+                    d->setMove(-1);
                 }
             }
 
@@ -136,6 +141,6 @@ RunAsRobot::RunAsRobot(int id, char ip[], int pushFor)
         }// end for(;;)
     }
 
-
+    cout << "goodbye" << endl;
 }
 

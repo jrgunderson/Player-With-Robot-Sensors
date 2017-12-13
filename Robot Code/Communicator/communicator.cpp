@@ -213,6 +213,11 @@ int Communicator::getMove()
     return this_move;
 }
 
+void Communicator::setMove(int m)
+{
+    this_move = m;
+}
+
 
 
 // send command
@@ -247,23 +252,23 @@ void Communicator::parse_msg(char *msg){
             printf("This is a R type of message\n");
             isReady = true;
             token = NULL;
-            sleep(1);
             emit(startReceived());
+            sleep(1);
         }
         else if ((token[0] == 'T')) {
             printf("This is a T type of message\n");
             token = NULL;
-            sleep(1);
             emit(taskReceived());
+            sleep(1);
         }
         else if ((token[0] == 'S')) {
+            char &c = token[1];
             printf("This is a S type of message\n");
-            ptr = strstr(token, "$");
             toStart = true;
-            startBroken = atoi(ptr);
+            startBroken = atoi(&c);
             token = NULL;
-            sleep(1);
             emit(startReceived());
+            sleep(1);
         }
         else if ((token[0] == 'E')) {
             isError = true;
@@ -271,32 +276,31 @@ void Communicator::parse_msg(char *msg){
             ptr = strstr(token, "$");
             ptr++;
             token = NULL;
-            sleep(1);
             emit(errorReceived(ptr));
+            sleep(1);
         }
         else if ((token[0] == 'M')) {
             printf("This is a M type of message\n");
             ptr = strstr(token, "$");
             ptr++;
             this_move = atoi(ptr);
-            //cout << "this_move = " << this_move << endl;
             token = NULL;
-            sleep(1);
             emit(moveReceived(this_move));
+            sleep(1);
         }
         else if ((token[0] == 'H')) {
-            printf("This is a H type of message\n");
             needHelp = true;
+            printf("This is a H type of message\n");
             token = NULL;
-            sleep(1);
             emit(helpReceived());
+            sleep(1);
         }
         else if ((token[0] == 'X')) {
-            printf("This is a X type of message\n");
             isSuccessful = true;
+            printf("This is a X type of message\n");
             token = NULL;
-            sleep(1);
             emit(successReceived());
+            sleep(10);
         }
     }
 }

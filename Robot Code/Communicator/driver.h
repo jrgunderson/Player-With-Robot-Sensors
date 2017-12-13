@@ -23,6 +23,7 @@ class Driver
         void SendSuccess();
         int getMove();
         void Close();
+        void setMove(int m);
         bool toStart();
         bool startBroken();
         bool isReady();

@@ -30,6 +30,7 @@ public:
     void send_Error(char *emsg);
     void send_Move(int i);
     int getMove();
+    void setMove(int m);
     bool getStart();
     bool errorStart();
     bool getReady();

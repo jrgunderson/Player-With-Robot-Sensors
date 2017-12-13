@@ -164,13 +164,13 @@ void Locate::moveForwards()
 void Locate::moveRight()
 {
     robot.Read();
-    pp.SetSpeed(0.0, -cap/2);
+    pp.SetSpeed(0.0, -cap);
 }
 
 void Locate::moveLeft()
 {
     robot.Read();
-    pp.SetSpeed(0.0, cap/2);
+    pp.SetSpeed(0.0, cap);
 }
 
 
@@ -197,13 +197,14 @@ int Locate::pushLeft(int n)
         // if other robot malfunctions
         if(d->isError())
         {
-		  wait(1);
+            stop();
             cout << "HELP! WHAT TO DO!?" << endl;
             return i; // return how many iterations there are left to push
         }
 
     }
 
+    stop();
     return YES;
 }
 

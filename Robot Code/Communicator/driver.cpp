@@ -74,6 +74,11 @@ int Driver::getMove()
     return com->getMove();
 }
 
+void Driver::setMove(int m)
+{
+    com->setMove(m);
+}
+
 bool Driver::toStart()
 {
     return com->getStart();

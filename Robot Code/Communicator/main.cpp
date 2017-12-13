@@ -9,7 +9,7 @@ char ipRight[] = "10.42.0.42"; // IP address for Robot1
 char ipLeft[] = "10.42.0.11"; // IP address for Robot2
 
 int pushFor = 75; // number of iterations to push box for
-bool toError = 0; // HUB tell robotA to fail?
+bool toError = 1; // HUB tell robotA to fail?
 
 
 void runAsHub(Driver *d);
@@ -29,15 +29,6 @@ int main(int argc, char *argv[])
     }
     else if(ID == 2){
         new RunAsRobot(ID, ipRight, pushFor);
-    }
-
-    // DEBUG
-    else if(ID == 99)
-    {
-        char ip[] = "";
-        cout << "Entering DEBUG mode" << endl;
-        Driver *d = new Driver(ip);
-        // Test Driver functions
     }
 
 
@@ -100,7 +91,6 @@ void runAsHub(Driver *d)
             break;
         }
 
-        sleep(1); // slow down loop a little
     }
 
 }
