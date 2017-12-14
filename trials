@@ -1,0 +1,13 @@
+Scenario 1:
+Have two robots pushing the box first and then simulate a failure on one of the robots, the operator decides to have one robot pushing instead b/c he is busy; then the operator can interrupt and join the mission to help complete the task with the robot. This scenario is showing how the sliding autonomy works under various situations.
+ 
+Scenario 2:
+Same as before, but the operator is not going to join the team.
+ 
+Scenario 3:
+Same as before, but the operator is going to teleoperate the failed robot to help push the box with the other robot.
+ 
+Scenario 4:
+Have two robots pushing the box successfully to the goal. No failure introduced.
+ 
+For all scenarios, you need to run them with the same starting point, goal point, and failure point. Please document, the time of each event (such as when robot fails, it sends error message back, when did the operator reply back to the error message, when did the operator join the team or start teleoperation mode, etc.). Please also report on completion time and success rate (successful trails/total trials). The other thing to report will be your UI, you will need to answer some questions from a survey as cited from the sliding autonomy paper that I sent you. Please also have Joseph try your UI and document the results.

@@ -1,7 +1,3 @@
-/*
- * communicator.cpp
- * Ian Stodart @ 2017
- */
 
 #include "communicator.h"
 
