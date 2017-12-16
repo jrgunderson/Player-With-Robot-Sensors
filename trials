@@ -1,26 +1,20 @@
-For all scenarios, you need to run them with the same starting point, goal point, and failure point.
+For all scenarios, run them with the same starting point, goal point, and failure point.
 
-Scenario 1:
-Have two robots pushing the box first and then simulate a failure on one of the robots, 
-the operator decides to have one robot pushing instead b/c he is busy; then the operator 
-can interrupt and join the mission to help complete the task with the robot. 
-This scenario is showing how the sliding autonomy works under various situations.
- 
-Scenario 2:
-Same as before, but the operator is not going to join the team.
- 
-Scenario 3:
-Same as before, but the operator is going to teleoperate the failed robot to 
-help push the box with the other robot.
- 
-Scenario 4:
+Scenario 1 (Full Autonomy – No Error):
 Have two robots pushing the box successfully to the goal. No failure introduced.
 
+Scenario 2 (Teleoperation):
+Have two robots pushing the box first and then simulate a failure on one of the robots, the operator is then going to teleoperate the failed robot to help push the box with the other robot.
 
-measure: total task time, total human_user time, success rate (successful trails/total trials).
+Scenario 3 (P2P): 
+Same as before, but the operator physically joins the functioning robot to push the box to the goal location.
+
+Scenario 4 (System Initiative):
+Same as before, but the operator is not going to join the team.  After a set time, the non-failed robot will realize it will receive no help and push the box the remainder of the way on its own.
+
+Scenario 5 (Mixed Initiative):
+Same as before, but the operator decides to have one robot pushing instead b/c he is busy; then the operator can interrupt and join the mission to help complete the task with the robot. 
+This scenario is showing how the sliding autonomy works under various situations.
 
 
------------------------------------------------------------------------------------------------
-Please document, the time of each event (such as when robot fails, it sends error message back, 
-when did the operator reply back to the error message, when did the operator join the team or 
-start teleoperation mode, etc.).
+measure: total task time, workload (total human_user time), success rate (successful trails/total trials).
