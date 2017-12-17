@@ -286,7 +286,7 @@ void Locate::wait(int n )
 
 
 // wait for 'ready' or 'end' message
-// returns true if ending_trial
+// returns true if exiting current task
 bool Locate::wait4ready()
 {
     for(;;)
@@ -329,15 +329,20 @@ void Locate::wait2start()
 }
 
 // n =  number of times to go back and forth
-void Locate::pushBoxAlone(int n)
+// returns 0 if pushed successfull
+int Locate::pushBoxAlone(int n)
 {
+    int stop = false;
     for( int i=0; i<n; ++i)
     {
-        goToRightSide();
-        push(20);
-        goToLeftSide();
-        push(25);
+        stop = goToRightSide();
+        stop = push(20);
+        stop = goToLeftSide();
+        stop = push(25);
     }
+
+    // any number other than 0 means task interrupted
+    return stop;
 }
 
 
@@ -386,9 +391,10 @@ int Locate::push(int t)
 
 
 // send robot to right side of box
-void Locate::goToRightSide()
+// returns 'true' if quitting task
+bool Locate::goToRightSide()
 {
-    // assuming robot front-facing box -> turn left 90 degrees
+    // assuming robot front-facing box -> turn right 90 degrees
     turnRight(middle);
     adjustRight(left);
 
@@ -400,16 +406,19 @@ void Locate::goToRightSide()
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up
-    moveForwardFromLeft(leftEye);
+    bool stop = moveForwardFromLeft(leftEye);
 
-    // assuming robot's eyesight is parallel to box -> turn right 90 degrees
+    // assuming robot's eyesight is parallel to box -> turn left 90 degrees
     turnLeft(left);
     adjustLeft(middle);
+
+    return stop;
 }
 
 
 // send robot to left side of box
-void Locate::goToLeftSide()
+// returns 'true' if quitting task
+bool Locate::goToLeftSide()
 {
     // assuming robot front-facing box -> turn left 90 degrees
     turnLeft(middle);
@@ -417,16 +426,19 @@ void Locate::goToLeftSide()
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up
-    moveForwardFromRight(rightEye);
+    bool stop = moveForwardFromRight(rightEye);
 
     // assuming robot's eyesight is parallel to box -> turn right 90 degrees
     turnRight(right);
     adjustRight(middle);
+
+    return stop;
 }
 
 
 // move forward assuming box on right side
-void Locate::moveForwardFromRight(int dp)
+// returns 'true' if quitting task
+bool Locate::moveForwardFromRight(int dp)
 {
 
     std::cout << "\nMoving Forward\n" << std::endl;
@@ -442,6 +454,7 @@ void Locate::moveForwardFromRight(int dp)
     }
 
 
+    bool over = false;
     double boxDist = 999;
     for( ;; )
     {
@@ -497,12 +510,26 @@ void Locate::moveForwardFromRight(int dp)
         pp.SetSpeed(speed, newturnrate);
 
         boxDist = distAvg;
-    }
+
+
+        // will pause if receive error
+        if( d->isError() )
+        {
+            over = wait4ready();
+
+            // will exit if received End_Task signal while waiting
+            if(over){
+                return true;
+            }
+        }
+    }// end for(;;)
+    return 0;
 }
 
 
 // move forward assuming box on left side
-void Locate::moveForwardFromLeft(int dp)
+// returns 'true' if quitting task
+bool Locate::moveForwardFromLeft(int dp)
 {
     std::cout << "\nMoving Forward\n" << std::endl;
 
@@ -517,6 +544,7 @@ void Locate::moveForwardFromLeft(int dp)
     }
 
 
+    bool over = false;
     double boxDist = 999;
     for( ;; )
     {
@@ -574,8 +602,49 @@ void Locate::moveForwardFromLeft(int dp)
         pp.SetSpeed(speed, newturnrate);
 
         boxDist = distAvg;
-    }
+
+
+        // will pause if receive error
+        if( d->isError() )
+        {
+            over = wait4ready();
+
+            // will exit if received End_Task signal while waiting
+            if(over){
+                return true;
+            }
+        }
+    }// end for(;;)
+    return 0;
 }
+
+
+// turn around 180 degrees -> Box on robot's Left side
+void Locate::turnAroundLeft()
+{
+    // assuming robot's eyesight is parallel to box -> turn right 90 degrees
+    turnLeft(left);
+    adjustLeft(middle);
+
+    // assuming robot front-facing box -> turn left 90 degrees
+    turnLeft(middle);
+    adjustLeft(right);
+
+}
+
+// turn around 180 degrees -> Box on robot's Right side
+void Locate::turnAroundRight()
+{
+    // assuming robot's eyesight is parallel to box -> turn right 90 degrees
+    turnRight(right);
+    adjustRight(middle);
+
+    // assuming robot front-facing box -> turn left 90 degrees
+    turnRight(middle);
+    adjustRight(left);
+
+}
+
 
 
 // turn right

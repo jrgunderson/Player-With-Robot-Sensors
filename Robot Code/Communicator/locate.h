@@ -22,35 +22,37 @@ public:
 
     Locate(Driver* driver, int id, int pushfor);
     int run();
+    int avoidWalls();
+    int locateBox();
+    int locateBoxOffset();
+
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
     int getBoxSize(int index);
     int getMiddleIndex(int index);
-    int shortestIndex(int r, int l);
-    void adjustLeft(int dp);
-    void adjustRight(int dp);
-    void moveForwardFromRight(int dp);
-    void moveForwardFromLeft(int dp);
     int getBoxRightIndex(int index);
     int getBoxLeftIndex(int index);
+    int shortestIndex(int r, int l);
+
+    bool goToLeftSide();
+    bool goToRightSide();
+    bool moveForwardFromRight(int dp);
+    bool moveForwardFromLeft(int dp);
     void turnLeft(int dp);
     void turnRight(int dp);
-    void goToLeftSide();
-    void goToRightSide();
+    void adjustLeft(int dp);
+    void adjustRight(int dp);
+    void turnAroundLeft();
+    void turnAroundRight();
+
+    int pushBoxAlone(int n);
+    int push(int t);
     int pushRight(int n);
     int pushLeft(int n);
-    void pushBoxAlone(int n);
-    int push(int t);
-    int avoidWalls();
-    int locateBoxOffset();
-    int locateBox();
-    double sumOfMagnitudes(int start, int end);
-    double getRightHypotenuse();
-    double getLeftHypotenuse();
-    bool didTilt(int iLeft, int iRight);
+
     void wait(int n);
-    bool wait4ready();
     void wait2start();
+    bool wait4ready();
     void introduceError();
     void clear();
     void moveBackards();
@@ -59,6 +61,11 @@ public:
     void moveRight();
     void stop();
     void slow();
+
+    double sumOfMagnitudes(int start, int end);
+    double getRightHypotenuse();
+    double getLeftHypotenuse();
+    bool didTilt(int iLeft, int iRight);
 
 private:
 

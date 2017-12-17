@@ -24,12 +24,12 @@ int main(int argc, char *argv[])
         runAsHub(d);
     }
 
-    else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, hostIP, pushFor);
-    }
-    else if(ID == 2){
-        new RunAsRobot(ID, ipRight, hostIP, pushFor);
-    }
+//    else if(ID == 1){
+//        new RunAsRobot(ID, ipLeft, hostIP, pushFor);
+//    }
+//    else if(ID == 2){
+//        new RunAsRobot(ID, ipRight, hostIP, pushFor);
+//    }
 
 
 }
@@ -55,24 +55,54 @@ void runAsHub(Driver *d)
     {           
         if(d->needHelp())
         {
-            cout << "Robot2 Needs Help!\n 1=push straight, 2=push alone, 3=teleoperate Robot1" << endl;
+            cout << "Robot2 Needs Help!\n 1= Push Straight, 2= Push Alone, 3= Teleoperate Robot1,\n"
+                    "9= Pause (can only interrupt if NOT turning)" << endl;
 
             // tell robot2 how to continue
             cin >>  todo;
-            todo += 10; // convert to format for Robot1 to pass message to Robot2
             d->Move(todo);
 
 
-            // if teleoperating Robot1
-            if(todo == 13)
+            // if interrupted, may need to give semi-autonomous commands
+            if(todo == 9)
             {
-                 cout << "0=stop, 2=reverse, 4=left, 6=right, 8=forward,\n1=SendReady, 9=SendError, 99=TaskComplete" << endl;
+                cout << "1= Resume, 3= Quit Task"
+                        "4= Go to Left Side of box (facing box),\n"
+                        "5= Go to Left Side of box (box to the Right)\n"
+                        "6= Go to Left Side of box (box to the Left)\n"
+                        "7= Go to Right Side of box (facing box)\n"
+                        "8= Go to Right Side of box (box to the Right)\n"
+                        "9= Go to Right Side of box (box to the Left)\n"
+                        "99= Exit Semi-Autonomous Mode" << endl;
+
+                for(;;)
+                {
+                    cin >>  todo;
+                    d->Move(todo);
+
+                    if(todo == 99 || todo == 1){
+                        break;
+                    }
+                    sleep(1);
+                }
+            }
+
+
+            // if teleoperating Robot1
+            if(todo == 3)
+            {
+                 cout << "2= Reverse, 4= Left, 6= Right, 8= Forward,\n"
+                         "1= SendReady, 7= Exit Teloperation, 99= TaskComplete" << endl;
                  for(;;){
                      cin >>  todo;
                      d->Move(todo);
 
-                     if(todo == 99 || todo == 1){
+                     if(todo == 99 || todo == 1){ // task completed
                          taskComplete = true;
+                         break;
+                     }
+                     if(todo == 7){ // exit teleoperation but task not complete
+
                          break;
                      }
                  }
@@ -81,7 +111,7 @@ void runAsHub(Driver *d)
 
         }
 
-        // if Robot2 told me task complete
+        // if Robot2 did not need help && told me task complete
         else if(d->isSuccessful())
         {
             cout << "! TASK COMPLETE !" << endl;
