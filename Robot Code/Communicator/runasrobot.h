@@ -7,9 +7,9 @@
 class RunAsRobot
 {
 public:
-    RunAsRobot(int id, char robotIP[], char hostIP[], int pushFor);
+    RunAsRobot(int id, char robotIP[], int pushFor);
     void Robot1();
-    void Robot2(char hostIP[]);
+    void Robot2();
     bool Teleoperate(int pushFor);
     void SemiAuto();
 

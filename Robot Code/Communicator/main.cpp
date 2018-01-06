@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
     }
 
     else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, hostIP, pushFor);
+        new RunAsRobot(ID, ipLeft, pushFor);
     }
     else if(ID == 2){
-        new RunAsRobot(ID, ipRight, hostIP, pushFor);
+        new RunAsRobot(ID, hostIP, pushFor);
     }
 
 
@@ -49,10 +49,23 @@ void runAsHub(Driver *d)
     cout << "Let the trials begin!" << endl;
 
 
+    // forward Ready Messages from robot2 to robot1
+    for(;;)
+    {
+        if(d->isReady())
+        {
+            d->SendReady();
+            break;
+        }
+
+    }
+
+
     // wait to see if robot's completed task
     bool taskComplete= false;
     for(;;)
-    {           
+    {
+
         if(d->needHelp())
         {
             cout << "Robot2 Needs Help!\n 1= Push Straight, 2= Push Alone, 3= Teleoperate Robot1,\n"
@@ -101,9 +114,10 @@ void runAsHub(Driver *d)
                          taskComplete = true;
                          break;
                      }
-                 }
 
-            }
+                  }
+
+             }
 
         }
 

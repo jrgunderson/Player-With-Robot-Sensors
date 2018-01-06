@@ -12,7 +12,7 @@ Locate *l;
 
 
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
-RunAsRobot::RunAsRobot(int id, char robotIP[], char hostIP[], int pushFor)
+RunAsRobot::RunAsRobot(int id, char robotIP[], int pushFor)
 {
     dr = new Driver(robotIP);
     l = new Locate(dr, id, pushFor);
@@ -23,7 +23,7 @@ RunAsRobot::RunAsRobot(int id, char robotIP[], char hostIP[], int pushFor)
     }
     else if(id == 2)
     {
-        Robot2( hostIP );
+        Robot2();
     }
 
     cout << "goodbye" << endl;
@@ -110,18 +110,15 @@ void RunAsRobot::Robot1()
 
 
 // Robot2 (Left_Robot) do this...
-void RunAsRobot::Robot2(char hostIP[])
+void RunAsRobot::Robot2()
 {
 
      int pushesRemain = l->run();
 
-     // create new talk thread - BUT keep old listen thread
-     Driver *hd = new Driver(hostIP);
-
      // if ERROR
      if(pushesRemain > 0)
      {
-         hd->SendHelp();
+         dr->SendHelp();
 
          pushesRemain +=11; // this robot will always need to catch-up
          cout << pushesRemain << endl;
@@ -211,7 +208,7 @@ void RunAsRobot::Robot2(char hostIP[])
      }
 
      // tell HUB task is complete
-     hd->SendSuccess();
+     dr->SendSuccess();
 }
 
 
