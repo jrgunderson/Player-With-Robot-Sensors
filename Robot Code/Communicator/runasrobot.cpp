@@ -99,7 +99,6 @@ void RunAsRobot::Robot1()
             }
         }
 
-
         // leave state machine if appropriate to
         if(exit == true){
             break;
@@ -114,7 +113,7 @@ void RunAsRobot::Robot1()
 void RunAsRobot::Robot2(char hostIP[])
 {
 
-    int pushesRemain = l->run();
+     int pushesRemain = l->run();
 
      // create new talk thread - BUT keep old listen thread
      Driver *hd = new Driver(hostIP);
@@ -129,7 +128,7 @@ void RunAsRobot::Robot2(char hostIP[])
 
          // wait for HUB to tell you what to do
          int move;
-         int timeout = 30;
+         int timeout = 20;
          time_t start = time(0);
          for(;;)
          {
@@ -248,7 +247,9 @@ bool RunAsRobot::Teleoperate(int pushFor)
                 case 88: l->moveForwards(); sleep(2); break; // long Forward
                 case 888: l->moveForwards(); sleep(4); break; // longer Forward
 
-                case 1: dr->SendReady(); l->push(pushFor); break;
+                case 1: dr->SendReady();
+                        if( l->push(pushFor) == 0 ) { exit = true; }
+                        break;
 
                 case 7: exit = true; break;
                 case 9: dr->Error(); break;
@@ -261,6 +262,8 @@ bool RunAsRobot::Teleoperate(int pushFor)
             l->stop();
             dr->setMove(-1);
         }
+
+        if(exit){break;}
     }
 
 

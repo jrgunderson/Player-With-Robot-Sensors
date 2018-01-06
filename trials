@@ -1,5 +1,3 @@
-For all scenarios, run them with the same starting point, goal point, and failure point.
-
 Scenario 1 (Full Autonomy – No Error):
 Have two robots pushing the box successfully to the goal. No failure introduced.
 
@@ -13,8 +11,11 @@ Scenario 4 (System Initiative):
 Same as before, but the operator is not going to join the team.  After a set time, the non-failed robot will realize it will receive no help and push the box the remainder of the way on its own.
 
 Scenario 5 (Mixed Initiative):
-Same as before, but the operator decides to have one robot pushing instead b/c he is busy; then the operator can interrupt and join the mission to help complete the task with the robot. 
-This scenario is showing how the sliding autonomy works under various situations.
+Same as before, where robot will decide to push box on its own. Then after some time (probably after the robot pushes each side of the box once) the operator will interrupt and join the mission to help complete the task with the robot.  This scenario is showing how the sliding autonomy works under various situations.
 
+* All scenarios, will have the same starting point, goal point, and failure point.
 
-measure: total task time, workload (total human_user time), success rate (successful trails/total trials).
+Variables to measure: 
+- total task time, 
+- workload (total human_user time)
+- success rate (successful trails/total trials)
