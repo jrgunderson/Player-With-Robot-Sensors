@@ -1,46 +1,15 @@
+/*
+ * State Machine for HUB
+ */
 
-#include "driver.h"
-#include <string>
-#include "runasrobot.h"
+#include "runasHub.h"
 
-int ID = 0;  // 0=HUB, 1=Robot1, 2=Robot2
+Driver *d;
 
-char ipRight[] = "10.42.0.42"; // IP address for Robot1
-char ipLeft[] = "10.42.0.11"; // IP address for Robot2
-char hostIP[] = "10.42.0.1"; // IP address for HUB
-
-int pushFor = 75; // number of iterations to push box for
-bool toError = 1; // HUB tell robotA to fail?
-
-
-void runAsHub(Driver *d);
-
-int main(int argc, char *argv[])
-{
-
-    if(ID == 0)
-    {
-        Driver *d = new Driver(ipRight);
-        runAsHub(d);
-    }
-
-    else if(ID == 1){
-        new RunAsRobot(ID, ipLeft, pushFor);
-    }
-    else if(ID == 2){
-        new RunAsRobot(ID, hostIP, pushFor);
-    }
-
-
-}
-
-
-
-
-// State Machine for HUB
 // HUB must NOT change drivers -> all communications to Robot2 must be relayed Robot1
-void runAsHub(Driver *d)
+RunAsHub::RunAsHub(char robotIP[], bool toError)
 {
+    d = new Driver(robotIP);
 
     int todo;
     cout << "Press [1] when ready to commence trials" << endl;
@@ -135,5 +104,4 @@ void runAsHub(Driver *d)
         }
 
     }
-
 }

@@ -35,8 +35,9 @@ Helpful Programs:
 - Download Software:
 	- open terminal -> 'sudo apt-get update'
 
+	- 'Ubuntu Software Center' (basic installations of a few programs) 
+			or 
 	- 'Synaptic Package Manager' (full versions of many programs)
-		$ sudo apt-get install synaptic
 	
 - To extend battery life:
 	- download "TLP"

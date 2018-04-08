@@ -9,19 +9,26 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    communicate.c \
-    communicator.cpp \
-    driver.cpp \
-    locate.cpp \
-    runasrobot.cpp
+DISTFILES += \
+    myID.txt
+
+SOURCES += \
+    src/main.cpp \
+    src/communicate.c \
+    src/communicator.cpp \
+    src/driver.cpp \
+    src/locate.cpp \
+    src/runasrobot.cpp \
+    src/runasHub.cpp \
 
 HEADERS += \
-    communicate.h \
-    communicator.h \ args.h \
-    driver.h \
-    locate.h \
-    runasrobot.h
+    src/communicate.h \
+    src/communicator.h \
+    src/args.h \
+    src/driver.h \
+    src/locate.h \
+    src/runasrobot.h \
+    src/runasHub.h \
 
 linux-g++* {
     CONFIG += link_pkgconfig
@@ -35,3 +42,4 @@ INCLUDEPATH += ../../../../../../usr/local/include/player-3.1/libplayerc++/ \
                ../../../../../../usr/local/include/player-3.1
 DEPENDPATH += ../../../../../../usr/local/include/player-3.1/libplayerc++ \
               ../../../../../../usr/local/include/player-3.1
+
