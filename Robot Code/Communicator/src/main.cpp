@@ -12,26 +12,25 @@ int pushFor = 75; // number of iterations to push box for
 bool toError = 1; // HUB tell robotA to fail?
 
 
-int getID();
+int getID(); // 0=HUB, 1=Robot1(right), 2=Robot2(left)
+template<typename T1, typename T2> void print( T1 a, T2 b ){}
+
 
 int main(int argc, char *argv[])
 {
-    int ID = getID(); // 0=HUB, 1=Robot1(right), 2=Robot2(left)
-    cout << "My ID is: " << ID << endl;
+    int ID = getID();
+    print( "My ID is: ", ID );
 
     if(ID == 0)
     {
         new RunAsHub(ipRight, toError);
     }
-
     else if(ID == 1){
         new RunAsRobot(ID, ipLeft, pushFor);
     }
     else if(ID == 2){
         new RunAsRobot(ID, hostIP, pushFor);
     }
-
-
 }
 
 
@@ -54,4 +53,12 @@ int getID()
     inFile.close();
 
     return id;
+}
+
+
+//// To reduce typing  cout << <message, variable> << endl;
+template<typename T1, typename T2>
+void print( T1 a, T2 b )
+{
+    cout << a << b << endl;
 }

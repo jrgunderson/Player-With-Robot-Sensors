@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <ctime>
 #include "driver.h"
 
 #define RAYS 32

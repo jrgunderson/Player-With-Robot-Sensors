@@ -17,6 +17,7 @@ RunAsRobot::RunAsRobot(int id, char robotIP[], int pushFor)
     dr = new Driver(robotIP);
     l = new Locate(dr, id, pushFor);
 
+
     if(id == 1)
     {
         Robot1();

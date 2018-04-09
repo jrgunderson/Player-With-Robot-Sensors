@@ -1,8 +1,8 @@
 #ifndef RUNASROBOT_H
 #define RUNASROBOT_H
 
-#include "locate.h"
 #include <ctime>
+#include "locate.h"
 
 class RunAsRobot
 {
