@@ -14,38 +14,39 @@ RunAsHub::RunAsHub(char robotIP[], bool toError)
     int todo;
     cout << "Press [1] when ready to commence trials" << endl;
     cin >>  todo;
-    d->SendStart(toError); // tell robot1 to start
+    d->SendStart(toError); // tell robot1 to start (and whether trial will introduce error)
     cout << "Let the trials begin!" << endl;
 
 
-    // forward Ready Messages from robot2 to robot1
+    // wait for robot2 to move to its corner
     for(;;)
     {
         if(d->isReady())
         {
-            d->SendReady();
+            d->SendReady(); // forward Ready Message from robot2 to robot1
             break;
         }
 
     }
 
 
-    // wait to see if robot's completed task
-    bool taskComplete= false;
-    for(;;)
-    {
+    bool taskComplete= false; // flag that signifies HUB has completed task by teleoperation
 
+    for(;;) // wait to see if robots completed task
+    {
         if(d->needHelp())
         {
-            cout << "Robot2 Needs Help!\n 1= Push Straight, 2= Push Alone, 3= Teleoperate Robot1,\n"
-                    "9= Pause (can only interrupt if NOT turning)" << endl;
+            cout << "Robot2 Needs Help!\n 1= Push Straight (Peer to Peer),\n"
+                    "2= Push Alone (Full Autonomous), \n3= Teleoperate Robot1,\n"
+                    "9= Pause (can only interrupt if robots NOT turning)" << endl;
 
             // tell robot2 how to continue
             cin >>  todo;
             d->Move(todo);
 
 
-            // if interrupted, may need to give semi-autonomous commands
+            // if HUB interrupted System Initiative autonomy,
+            //  to give semi-autonomous (mixed-intiaitve) commands
             if(todo == 9)
             {
                 cout << "1= Resume, 3= Quit Task"
@@ -81,7 +82,7 @@ RunAsHub::RunAsHub(char robotIP[], bool toError)
 
                      if(todo == 99 || todo == 1){ // task completed
                          taskComplete = true;
-                         break;
+                         break; // breaks from teleoperate loop, but not from State Machine loop
                      }
 
                   }

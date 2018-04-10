@@ -1,5 +1,7 @@
 
-/*
+/* This class controls all of the Robot's movements
+ *
+ *
  * Task 1: - move towards box
  *
  * Task 2: - adjust until front facing box
@@ -11,7 +13,6 @@
  * Task 4: - push
  *      a) if Robot1 stops
  *      b) Robot2 will also stop
- *
  */
 
 #include "args.h"

@@ -1,3 +1,4 @@
+// wraps communicate c code into c++ code
 
 #include "communicator.h"
 

@@ -9,6 +9,7 @@
 
 Driver *dr;
 Locate *l;
+int timeout = 20; // how many seconds Robot2 waits before entering System-Iniative autonomy
 
 
 // id= this.RobotID, ip= IP address of OTHER ROBOT (sending messages to)
@@ -38,8 +39,7 @@ void RunAsRobot::Robot1()
     cout << "waiting to start" << endl;
     l->wait2start();
 
-    int pushesRemain = l->run();
-
+    int pushesRemain = l->run(); // if task not completed, there will be pushes leftover
     cout << pushesRemain << endl;
 
     // Regardless if ERROR or not...
@@ -62,7 +62,7 @@ void RunAsRobot::Robot1()
             case 1: dr->Move(1); sleep(1); exit = true; break; // P2P
             case 2: dr->Move(2); sleep(1); break; // Push Box Alone
             case 3: dr->Move(3); sleep(1); break; // Teleoperation
-            case 9: dr->Error(); sleep(1); break; // Pause
+            case 9: dr->Error(); sleep(1); break; // Pause (interrupt System-Initiative)
         }
 
         if( move == 3) // Enter Teleoperation Mode
@@ -71,18 +71,18 @@ void RunAsRobot::Robot1()
         }
 
 
-        if(move == 9) // Enter Semi-Autonomous Mode
+        if(move == 9) // forward messages from HUB interrupting Robot2
         {
             for(;;)
             {
                 move = dr->getMove();
 
-                // Resume Task
+                // Tell Robot2 to resume System-Intiative task
                 if(move == 1){
                     dr->SendReady();
                     break;
                 }
-                // Quit Task
+                // Tell Robot2 to end trial
                 else if(move == 3){
                     dr->SendSuccess();
                 }
@@ -92,7 +92,7 @@ void RunAsRobot::Robot1()
                     break;
                 }
 
-                // Forward Semi-Autonomous Move to Robot2
+                // Forward Semi-Autonomous 'reposition' Moves to Robot2
                 else{
                     dr->Move(move);
                 }
@@ -126,7 +126,6 @@ void RunAsRobot::Robot2()
 
          // wait for HUB to tell you what to do
          int move;
-         int timeout = 20;
          time_t start = time(0);
          for(;;)
          {
