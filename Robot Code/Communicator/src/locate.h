@@ -13,6 +13,7 @@ class Locate
 
 public:
 
+    // laser ranger variables
     double maxRange = -1;
     int scanPoints = -1;
     int right = -1;
@@ -22,10 +23,13 @@ public:
     int leftEye = -1;
 
     Locate(Driver* driver, int id, int pushfor);
+
+    // 'big-picture' trial methods
     int run();
     int avoidWalls();
     int locateBox();
 
+    // methods used to determine size of box
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
     int getBoxSize(int index);
@@ -34,6 +38,7 @@ public:
     int getBoxLeftIndex(int index);
     int shortestIndex(int r, int l);
 
+    // methods used in autonomously moving towards box
     bool goToLeftSide();
     bool goToRightSide();
     bool moveForwardFromRight(int dp);
@@ -45,11 +50,13 @@ public:
     void turnAroundLeft();
     void turnAroundRight();
 
+    // push methods
     int pushBoxAlone(int n);
     int push(int t);
     int pushRight(int n);
     int pushLeft(int n);
 
+    // methods to control robot's motor
     void wait(int n);
     void wait2start();
     bool wait4ready();
@@ -66,7 +73,8 @@ public:
     template<typename T1, typename T2 = string, typename T3 = string, typename T4 = string>
     void print( T1, T2 = "", T3 = "", T4 = "");
 
-private:
+
+private: // crutial global variables
 
     double cap = .2;
     double speed = cap;  // in meters per second

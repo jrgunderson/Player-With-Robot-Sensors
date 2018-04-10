@@ -1,5 +1,6 @@
 
 /* This class controls all of the Robot's movements
+ *  && uses Driver to send messages as well as react to incoming messages
  *
  *
  * Task 1: - move towards box
@@ -23,20 +24,17 @@ PlayerCc::PlayerClient *robot;
 PlayerCc::Position2dProxy *pp;
 PlayerCc::LaserProxy *lp;
 PlayerCc::RangerProxy *rp;
-
 time_t timer;
+const int YES = 0; // for clarity, variable that translates 0 -> succesfull push
 
-const int YES = 0;
 
 // constructor
 Locate::Locate(Driver* driver, int id, int pushfor)
 {
-
     PlayerCc::PlayerClient robot(gHostname, gPort);
     PlayerCc::Position2dProxy pp(&robot, gIndex);
     PlayerCc::LaserProxy lp(&robot, gIndex);
     PlayerCc::RangerProxy rp(&robot, gIndex);
-
 
     ID = id;
     d = driver;
@@ -51,7 +49,6 @@ int Locate::run()
     timer = time(0);
 
     print(robot);
-
 
     // throw exceptions on creation if fail
     try{
@@ -83,8 +80,8 @@ int Locate::run()
         }
 
 
-        index = avoidWalls();
-        index = locateBox();
+        index = avoidWalls(); // move towards box while avoiding walls
+        index = locateBox();  // move towards box after 'locking on'
 
 
         // tell me info about the box
@@ -111,23 +108,24 @@ int Locate::run()
             adjustLeft(middle);
         }
 
-        if(ID == 1){
+
+        if(ID == 1){ // robot1 move to the right side & push
             success = pushRight(pushFor);
         }
-        else{
+        else{ // robot2 move to the left side & push
             success = pushLeft(pushFor);
         }
 
+        clear(); // clear out sensor data
 
-        clear();
 
-      } // end try
-      catch (PlayerCc::PlayerError & e)
-      {
+    } // end try
+    catch (PlayerCc::PlayerError & e)
+    {
         std::cerr << e << std::endl;
-      }
+    }
 
-
+    // returns 0 if successful, else returns remainder of distance box needs to be pushed
     return success;
 }
 
@@ -138,8 +136,6 @@ void Locate::clear()
     for(int i=0; i<10; ++i)
     {
         robot->Read();
-        //robot.StopThread();
-        //robot.Stop();
         pp->SetMotorEnable(false);
     }
 }
@@ -220,7 +216,7 @@ int Locate::pushLeft(int n)
         }
 
     }
-
+    // return 0 iterations remaining to push (successfully pushed for planned distance)
     return YES;
 }
 
@@ -256,7 +252,7 @@ int Locate::pushRight(int n)
             }
         }
     }
-
+    // return 0 iterations remaining to push (successfully pushed for planned distance)
     return YES;
 }
 
@@ -393,7 +389,7 @@ int Locate::push(int t)
     robot->Read();
     pp->SetSpeed(speed, newturnrate);
 
-    return 0;
+    return YES; // return 0 iterations remaining to push
 }
 
 
