@@ -56,7 +56,7 @@ int getID()
 }
 
 
-//// To reduce typing  cout << <message, variable> << endl;
+// To reduce typing  cout << <message, variable> << endl;
 template<typename T1, typename T2>
 void print( T1 a, T2 b )
 {

@@ -50,7 +50,8 @@ int Locate::run()
     int success;
     timer = time(0);
 
-    std::cout << robot << std::endl;
+    print(robot);
+
 
     // throw exceptions on creation if fail
     try{
@@ -59,7 +60,7 @@ int Locate::run()
 
         robot->Read();
 
-        // read parameters
+        // read Laser Ranger parameters
         maxRange = lp->GetMaxRange();
         scanPoints = lp->GetCount();
         middle = scanPoints/2;
@@ -70,21 +71,20 @@ int Locate::run()
         rightEye = middle - fortyFiveDegrees;
         leftEye = middle + fortyFiveDegrees;
 
-        std::cout << rightEye << " -> " << leftEye << std::endl;
+        print(rightEye, " -> ", leftEye);
 
 
-        // initialize variables
-        int index = -1;
-        double boxSize = scanPoints;
+        int index = -1; // index of laser where box is located
+        double boxSize = scanPoints; // initialize box size to max
 
         if(ID == 2){
-            cout << "waiting for other robot" << endl;
+            print("waiting for other robot");
             wait2start();// second robot waits for first to tell it, it can start
         }
 
 
-        //index = avoidWalls();
-         index = locateBox();
+        index = avoidWalls();
+        index = locateBox();
 
 
         // tell me info about the box
@@ -92,11 +92,11 @@ int Locate::run()
         int leftBoxIndex = getBoxLeftIndex(index);
         index = (leftBoxIndex + rightBoxIndex)/2;
 
-        std::cout << "Box from index: " << rightBoxIndex << " -> " << leftBoxIndex << std::endl;
-        std::cout << "Middle at: " << index << std::endl;
+        print("Box from index: ", rightBoxIndex, " -> ", leftBoxIndex);
+        print("Middle at: ", index);
 
         boxSize = 2*sqrt( std::pow(lp->GetRange(rightBoxIndex),2) + pow(lp->GetRange(index),2) );
-        std::cout << "Size: " << boxSize << " meters" << std::endl;
+        print("Size: ", boxSize, " meters");
 
 
 
@@ -198,7 +198,7 @@ int Locate::pushLeft(int n)
 {
     goToLeftSide();
 
-    std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
+    print( "It took me: ", (time(0)-timer), " seconds to get here");
 
     d->SendReady(); // send that you're ready to push!
     wait4ready(); // wait for other robot to acknowledge it is ready
@@ -215,7 +215,7 @@ int Locate::pushLeft(int n)
         if(d->isError())
         {
             stop();
-            cout << "HELP! WHAT TO DO!?" << endl;
+            print( "HELP! WHAT TO DO!?" );
             return i; // return how many iterations there are left to push
         }
 
@@ -234,7 +234,7 @@ int Locate::pushRight(int n)
 
     goToRightSide();
 
-    std::cout << "It took me: " << (time(0)-timer) << " seconds to get here" << std::endl;
+    print("It took me: ", (time(0)-timer), " seconds to get here");
 
     wait4ready(); // wait for ready message from other robot to push
     d->SendReady(); // tell other robot you received their ready message
@@ -447,8 +447,7 @@ bool Locate::goToLeftSide()
 // returns 'true' if quitting task
 bool Locate::moveForwardFromRight(int dp)
 {
-
-    std::cout << "\nMoving Forward\n" << std::endl;
+    print("\nMoving Forward\n");
 
 
     if(newturnrate != 0)
@@ -461,9 +460,9 @@ bool Locate::moveForwardFromRight(int dp)
     }
 
 
-    bool over = false;
+    bool over = false; // flag for recieving task completion message
     double boxDist = 999;
-    for( ;; )
+    for(;;)
     {
         robot->Read();
 
@@ -471,7 +470,7 @@ bool Locate::moveForwardFromRight(int dp)
         for( int i=dp-5; i<dp+5; ++i ) // in case it passed the end when looping
         {
 
-             cout << lp->GetRange(i-1) << " - " << lp->GetRange(i) << " > .5?" << endl;
+            print(lp->GetRange(i-1), " - ", lp->GetRange(i), " > .5?");
 
             if( abs(lp->GetRange(i+1)- lp->GetRange(i)) > .5 || lp->GetRange(i+1) == 0 )
             {
@@ -491,12 +490,12 @@ bool Locate::moveForwardFromRight(int dp)
 
         // ajust if robot getting too close to box |or| getting to far away
         double distAvg = 0;
-         for( int i=right-5; i<right+5; ++i )
-         {
-
+        for( int i=right-5; i<right+5; ++i )
+        {
             distAvg += lp->GetRange(i);
+        }
+        distAvg /= 10;
 
-         }
         if( distAvg < boxDist )
         {
             newturnrate = .1;
@@ -509,9 +508,8 @@ bool Locate::moveForwardFromRight(int dp)
             newturnrate = 0;
         }
 
-        std::cout << "\noldDist: " << boxDist << ", vs newDist: " << distAvg << std::endl;
-
-        std::cout << "speed: " << speed << ", turnrate: " << newturnrate << std::endl;
+        print("\noldDist: ", boxDist, ", vs newDist: ", distAvg);
+        print("speed: ", speed, ", turnrate: ", newturnrate);
 
 
         pp->SetSpeed(speed, newturnrate);
@@ -538,7 +536,7 @@ bool Locate::moveForwardFromRight(int dp)
 // returns 'true' if quitting task
 bool Locate::moveForwardFromLeft(int dp)
 {
-    std::cout << "\nMoving Forward\n" << std::endl;
+    print("\nMoving Forward\n");
 
 
     if(newturnrate != 0)
@@ -551,20 +549,20 @@ bool Locate::moveForwardFromLeft(int dp)
     }
 
 
-    bool over = false;
+    bool over = false; // flag for recieving task completion message
     double boxDist = 999;
-    for( ;; )
+    for(;;)
     {
         robot->Read();
 
-        std::cout << dp << std::endl;
+        print( dp );
 
         // box ends once no longer incrementally increasing consecutive distances
         for( int i=dp+5; i>=dp-5; --i )
         {
+            print(lp->GetRange(i-1), " - ", lp->GetRange(i), " > .5?");
 
-            cout << lp->GetRange(i-1) << " - " << lp->GetRange(i) << " > .5?" << endl;
-
+            // box ends once jump in distance between laser indices
             if( abs(lp->GetRange(i-1)- lp->GetRange(i)) > .5 || lp->GetRange(i-1) == 0  )
             {
                 speed = 0;
@@ -583,13 +581,12 @@ bool Locate::moveForwardFromLeft(int dp)
 
         // ajust if robot getting too close to box |or| getting to far away
         double distAvg = 0;
-         for( int i=left-5; i<left+5; ++i )
-         {
-
+        for( int i=left-5; i<left+5; ++i )
+        {
             distAvg += lp->GetRange(i);
+        }
+        distAvg /= 10;
 
-         }
-         distAvg /= 10;
         if( distAvg < boxDist )
         {
             newturnrate = -.1;
@@ -602,9 +599,8 @@ bool Locate::moveForwardFromLeft(int dp)
             newturnrate = 0;
         }
 
-        std::cout << "\noldDist: " << boxDist << ", vs newDist: " << distAvg << std::endl;
-
-        std::cout << "speed: " << speed << ", turnrate: " << newturnrate << std::endl;
+        print("\noldDist: ", boxDist, ", vs newDist: ", distAvg);
+        print("speed: ", speed, ", turnrate: ", newturnrate);
 
         pp->SetSpeed(speed, newturnrate);
 
@@ -673,8 +669,8 @@ void Locate::turnRight(int dp)
     {
         robot->Read();
 
-        std::cout << "Eye see: "<< eye << std::endl;
-        std::cout << lp[dp] << std::endl;
+        print("Eye see: ", eye);
+        print( lp->GetRange(dp) );
 
         // box ends once no longer incrementally increasing consecutive distances
         if( abs(lp->GetRange(dp) - eye) > .5 || lp->GetRange(dp) <= .01 )
@@ -685,7 +681,7 @@ void Locate::turnRight(int dp)
             break;
         }
 
-        cout << "turnrate: " << newturnrate << endl;
+        print( "turnrate: ", newturnrate);
         pp->SetSpeed(speed, newturnrate);
 
         eye = lp->GetRange(dp);
@@ -695,7 +691,7 @@ void Locate::turnRight(int dp)
 // turn left
 void Locate::turnLeft(int dp)
 {
-    std::cout << "\nTurning Left\n" << std::endl;
+    print("\nTurning Left\n");
 
     if(newturnrate < cap)
     {
@@ -707,12 +703,12 @@ void Locate::turnLeft(int dp)
     }
 
     double eye = lp->GetRange(dp);
-    for( ;; )
+    for(;;)
     {
         robot->Read();
 
-        cout << "Eye see: "<< eye << endl;
-        cout << lp->GetRange(dp) << endl;
+        print("Eye see: ", eye);
+        print( lp->GetRange(dp) );
 
         // box ends once no longer incrementally increasing consecutive distances
         if( abs(lp->GetRange(dp) - eye) > .5 || lp->GetRange(dp) <= .01 )
@@ -734,7 +730,7 @@ void Locate::turnLeft(int dp)
 // compares distances from dp -> LeftBoxIndex
 void Locate::adjustLeft(int dp)
 {
-    std::cout << "\nAdjusting Left\n" << std::endl;
+    print("\nAdjusting Left\n");
 
     if(newturnrate <= 0)
     {
@@ -749,7 +745,7 @@ void Locate::adjustLeft(int dp)
     double avg2 = 999;
     int trial = 0;
 
-    for( ;; )
+    for(;;)
     {
         robot->Read();
 
@@ -757,18 +753,17 @@ void Locate::adjustLeft(int dp)
         double avg = 0;
         int end = getBoxLeftIndex(dp);
 
-        std::cout << dp << " -> " << end << std::endl;
+        print(dp, " -> ", end);
 
         // datapoint at which box ends will continously change as robot turns
         for(int i=dp; i<end; ++i )
         {
-
             avg += lp->GetRange(i);
-
         }
         avg = avg/(end-dp+1);
-        std::cout << "\navg:  " << avg << std::endl;
-        std::cout << "avg1: "<< avg1 << ", avg2: " << avg2 << std::endl;
+
+        print("\navg:  ", avg);
+        print("avg1: ", avg1, ", avg2: ", avg2);
 
 
         // break if consistently increasing
@@ -780,9 +775,10 @@ void Locate::adjustLeft(int dp)
             break;
         }
 
+        // keeps track of previous 2 avgs
         if(trial == 0)
         {
-            avg1 = avg;
+            avg1 = avg; // only 1 previous avg to save
             ++trial;
         }
         else{
@@ -800,7 +796,7 @@ void Locate::adjustLeft(int dp)
 // compares distances from dp -> RightBoxIndex
 void Locate::adjustRight(int dp)
 {
-    std::cout << "\nAdjusting Right\n" << std::endl;
+    print("\nAdjusting Right\n");
 
     if(newturnrate >= 0)
     {
@@ -815,7 +811,7 @@ void Locate::adjustRight(int dp)
     double avg2 = 999;
     int trial = 0;
 
-    for( ;; )
+    for(;;)
     {
         robot->Read();
 
@@ -826,13 +822,12 @@ void Locate::adjustRight(int dp)
         // datapoint at which box ends will continously change as robot turns
         for(int i=dp; i>=end; --i )
         {
-
             avg += lp->GetRange(i);
-
         }
         avg = avg/(dp-end+1);
-        std::cout << "\navg:  " << avg << std::endl;
-        std::cout << "avg1: "<< avg1 << ", avg2: " << avg2 << std::endl;
+
+        print("\navg:  ", avg);
+        print("avg1: ", avg1, ", avg2: ", avg2);
 
 
         // break if consistently increasing
@@ -844,9 +839,10 @@ void Locate::adjustRight(int dp)
             break;
         }
 
+        // keeps track of previous 2 avgs
         if(trial == 0)
         {
-            avg1 = avg;
+            avg1 = avg; // only 1 previous avg to save
             ++trial;
         }
         else{
@@ -967,7 +963,7 @@ int Locate::avoidWalls()
         index = shortestIndex(rightEye, leftEye);
         double minObjDist = lp->GetRange(index);
 
-        std::cout << "\nCorner index " << index << " @ dist: " << minObjDist << std::endl;
+        print("\nCorner index ", index, "@ dist: ", minObjDist);
 
         boxSize = getBoxSize(index);
         index = getMiddleIndex(index);
@@ -984,19 +980,14 @@ int Locate::avoidWalls()
         {
             newturnrate = -1/(6*minObjDist); // turn right
         }
-        else{
+        else{ // box straight ahead
             newturnrate = 0;
         }
 
+        print("Size of Box: ", boxSize, ", Middle index: ", index);
+        print("speed: ", speed, " turn: ", newturnrate);
 
-        std::cout << "Size of Box: " << boxSize
-                << ", Middle index: "<< index << std::endl;
-
-        std::cout << "speed: " << speed
-                  << " turn: " << newturnrate
-                  << std::endl;
-
-        std::cout << "isWall? " << isWall << std::endl;
+        print("isWall? ", isWall); // tell me if you're moving towards a wall
 
 
         // turn away from wall
@@ -1017,7 +1008,7 @@ int Locate::avoidWalls()
         // stop scanning once finite object a reached certain distance
         if( minObjDist <= minRadius && !isWall )
         {
-            std::cout << "I FOUND A BOX!" << std::endl;
+            print("I FOUND A BOX!");
             break;
         }
 
@@ -1042,13 +1033,13 @@ int Locate::locateBox()
         index = shortestIndex(rightEye, leftEye);
         double minObjDist = lp->GetRange(index);
 
-        cout << "\nCorner index " << index << " @ dist: " << minObjDist << endl;
+        print("\nCorner index ", index, " @ dist: ", minObjDist);
 
         boxSize = getBoxSize(index);
         index = getMiddleIndex(index);
 
         // slow down as robot aproaches box
-        double newSpeed = std::pow(minObjDist,2);
+        double newSpeed = pow(minObjDist,2);
 
         if(newSpeed < speed)
         {
@@ -1086,14 +1077,8 @@ int Locate::locateBox()
             newturnrate = -cap;
         }
 
-
-        std::cout << "Size of Box: " << boxSize
-                << ", Middle index: "<< index << std::endl;
-
-        std::cout << "speed: " << speed
-                  << " turn: " << newturnrate
-                  << std::endl;
-
+        print("Size of Box: ", boxSize, ", Middle index: ", index);
+        print("speed: ", speed, " turn: ", newturnrate);
 
 
         // write commands to robot
@@ -1103,8 +1088,8 @@ int Locate::locateBox()
         // stop scanning once finite object a reached certain distance
         if( minObjDist <= minDist )
         {
-            cout << "I FOUND CENTER OF BOX!\n" << endl;
-            speed = 0;  // newturnrate = -newturnrate;
+            print("I FOUND CENTER OF BOX!\n");
+            speed = 0;
             robot->Read();
             pp->SetSpeed(speed, newturnrate);
             break;
@@ -1115,181 +1100,10 @@ int Locate::locateBox()
 }
 
 
-// FOR SMALL BOXES
-// move towards box but overshoot center of box by a little
-// so when robot turns to face box it is exactly at center
-int Locate::locateBoxOffset()
+
+//// To reduce typing  cout << <message, variable> << endl;
+template<typename T1, typename T2, typename T3, typename T4>
+void Locate::print( T1 a, T2 b, T3 c, T4 d )
 {
-    int index = -1;
-    int boxSize = scanPoints;
-
-    // go into read-think-act loop 2
-    for(;;)
-    {
-        robot->Read();
-
-        // locate corner of nearest obstacle (presumably a box)
-        index = shortestIndex(rightEye, leftEye);
-        double minObjDist = lp->GetRange(index);
-
-        std::cout << "\nCorner index " << index << " @ dist: " << minObjDist << std::endl;
-
-
-        // slow down as robot aproaches box
-        double newSpeed = std::pow(minObjDist,2);
-
-        if(newSpeed < speed)
-        {
-            speed = newSpeed;
-        }
-        else if( newSpeed < .15 )
-        {
-            speed = .15;
-        }
-
-
-        int rightSize = -1;
-        int leftSize = -1;
-
-        // if index in middle view of roomba
-        if (index > middle -5 && index < middle +5 )
-        {
-            boxSize = getBoxSize(index);
-        }
-        // need to figure out which corner box is facing
-        else{
-            leftSize = getSizeFromLeft(index);
-            rightSize = getSizeFromRight(index);
-        }
-
-        int offsetIndex = index;
-
-        // calculate middle data point for front of box
-        if( leftSize > rightSize ) // if left of center
-        {
-            offsetIndex = (boxSize/2) + index +5;
-            boxSize = leftSize;
-            std::cout << "Left size: " << boxSize << std::endl;
-
-        }
-        else if( rightSize > leftSize ) // if right of center
-        {
-            offsetIndex = index - (boxSize/2) -5;
-            boxSize = rightSize;
-            std::cout << "Right size: " << boxSize << std::endl;
-        }
-        else{
-            //index = getMiddleIndex(index);
-            std::cout << "Middle size: " << boxSize << std::endl;
-        }
-
-
-        // turn the robot until front facing middle of box
-        // turn rate increases as it gets closer to object
-        if( offsetIndex > middle ) // if left of center
-        {
-            newturnrate = 1/(6*minObjDist); // turn left
-
-        }
-        else if( offsetIndex < middle ) // if right of center
-        {
-            newturnrate = -1/(6*minObjDist); // turn right
-        }
-        else{
-            newturnrate = 0;
-        }
-
-        // cap turnrate
-        if( newturnrate > cap )
-        {
-            newturnrate = cap;
-        }
-        if( newturnrate < -cap )
-        {
-            newturnrate = -cap;
-        }
-
-
-        std::cout << "Offset middle at DataPoint: " << offsetIndex
-                << ", Distance: "<< minObjDist << std::endl;
-
-        std::cout << "speed: " << speed
-                  << " turn: " << newturnrate  << std::endl;
-
-        // write commands to robot
-        pp->SetSpeed(speed, newturnrate);
-
-
-        // stop scanning once finite object a reached certain distance
-        if( minObjDist <= minDist )
-        {
-            cout << "I FOUND CENTER OF BOX!\n" << endl;
-            speed = 0;  // newturnrate = -newturnrate;
-            robot->Read();
-            pp->SetSpeed(speed, newturnrate);
-            break;
-        }
-
-    } // end think-read-react loop 2
-
-    return index;
-}
-
-
-double Locate::sumOfMagnitudes(int start, int end)
-{
-    double sum = 0;
-    for(int i=start; i<=end; ++i)
-    {
-        sum+=lp->GetRange(i);
-    }
-
-    return sum;
-}
-
-// returns the distance from robot to right edge of box
-// assumes robot front facing box (forming a right degree angle)
-double Locate::getRightHypotenuse()
-{
-    double rh = lp->GetRange(getBoxRightIndex(middle));
-
-    if(rh != 0)
-    {
-        return rh;
-    }
-    return -1;
-}
-
-
-// returns the distance from robot to left edge of box
-// assumes robot front facing box (forming a right degree angle)
-double Locate::getLeftHypotenuse()
-{
-    double lh = lp->GetRange(getBoxLeftIndex(middle));
-
-    if(lh != 0)
-    {
-        return lh;
-    }
-    return -1;
-}
-
-
-// returns true if tilt detected in box's orientation
-bool Locate::didTilt(int iLeft, int iRight)
-{
-    double threshold = .2;
-    double rh = getRightHypotenuse();
-    double lh = getLeftHypotenuse();
-
-    if( rh != -1 && iRight != -1 && abs( rh - iRight ) > threshold )
-    {
-        return true;
-    }
-    else if( lh != -1 && iLeft != -1 && abs( lh - iLeft ) > threshold )
-    {
-        return true;
-    }
-
-    return false;
+    cout << a << b << c << d << endl;
 }

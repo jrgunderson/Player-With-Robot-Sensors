@@ -25,7 +25,6 @@ public:
     int run();
     int avoidWalls();
     int locateBox();
-    int locateBoxOffset();
 
     int getSizeFromLeft(int index);
     int getSizeFromRight(int index);
@@ -63,10 +62,9 @@ public:
     void stop();
     void slow();
 
-    double sumOfMagnitudes(int start, int end);
-    double getRightHypotenuse();
-    double getLeftHypotenuse();
-    bool didTilt(int iLeft, int iRight);
+    // for a 'pythonic' method of printing
+    template<typename T1, typename T2 = string, typename T3 = string, typename T4 = string>
+    void print( T1, T2 = "", T3 = "", T4 = "");
 
 private:
 
