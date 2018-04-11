@@ -1,0 +1,102 @@
+# communicate.c
+	- Written by Dr. Daisy Tang for sending and receiving messages
+
+# communicator.cpp
+	- Wraps the C code from communicate class into c++
+	- Sends messages
+	- Parses incoming messages and sets corresponding flags
+		- small 'system sleeps' so flags are not overwritten before 'Driver' has a chance to grab them.
+	- Getters for those flags
+
+# driver.cpp
+	- Wraps communicator into background threads (so robots can perform tasks while communicating)
+	
+# locate.cpp
+	- Contains any method that would have anything to do with moving the robot
+	- This is the class that uses the 'driver' wrapper
+
+# runasrobot.cpp
+	- State machine for Robot1 & Robot2
+	- Sliding autonomy for Robot2 
+	- Robot1 forwards messages from HUB to Robot2 
+	- Teleoperation of Robot1
+
+# runasHub.cpp
+	- State machine for HUB
+	- Input for starting trial
+	- Controls for sliding autonomy
+	
+
+
+--------------------------------------------------------------------------------------------------------
+
+# Project outline:
+
+Phase I
+	- Initialize trial info (IP addresses of machines will change with network change, how far to push box, will this trial introduce an error).
+	- Determines which machine (Hub, Robot1, Robot2) is running the code and runs corresponding machine's state machine.
+
+
+Phase II
+	- HUB Sends start message to Robot1.
+	- Robot1 locates the box & sends start message to Robot2 before locating its corner.
+		- Robot1 waits for message to start pushing.
+	- Robot2 locates the box, locates its corner, then sends message to HUB that it is ready to begin pushing.
+		- Robot2 waits for message that Robot1 is ready to push.
+	- HUB forwards that message.  Robot1 sends the Ready message and waits a 'heartbeat' before pushing.
+		- HUB stands by until it receives task completion/ task error message.
+	
+
+Phase III
+	# HUB #
+	- If received message from Robot2 that task completed, end trial.
+	- If received error, choose which mode of sliding autonomy to use
+		- if Robot2 does not receive help from HUB after 20 seconds, it pushes box on its own
+			- 'mixed initiative' interrupts this and reposition Robot2 (optional)
+		- P2P: tells Robot2 to just push straight, human operator will physically be with Robot2 to push with it
+		- Teleoperate: HUB will teleoperate the 'malfunctioned' Robot1
+		- Full-Autonomy: HUB tells Robot2 to just push the box on its own
+
+	# Robot2 #
+	- If box pushed for the distance designated in Phase I, send completion message to Hub and end trial.
+	- If Robot1 experiences an error, it will notify Robot2 and Robot2 will wait for instruction on how to proceed from HUB.
+	- If after 20 seconds it has not received any instruction, it will enter full-autonomy mode.
+	- If full autonomy is interrupted, Robot2 will wait for mixed-initiative reposition moves and/or further instruction on how to proceed (p2p, teleoperate, etc)
+
+* if error introduced, only robot1 needs to know, robot2 will react to robot1's failure
+
+* Semi-Autonomous -> System Initiative: 
+		  -> Mixed Initiative: Hub sends tells Robot which commands to complete (go to left corner of box vs. teleoperation)
+
+
+
+
+# locate.cpp: A closer look
+
+Phase I
+	- Initialize laser sensor variables (based on available datapoints)
+	- avoidWalls(): robot will move towards closest object,
+			if that object is a too large, it must be a wall and turn away from it
+	- Size is determined by number of datapoints the objects continues for
+		- there are 3 possible scenarios when determining size
+			- robot approaching box from right (closest object is the right corner of box)
+			- robot approaching box from left
+			- robot approaching box from middle (must find box's left/right indices)
+	- When the robot is moving towards an object that is definitely not a wall, that object will appear to be a wall as it gets closer - so once that object is within a certain distance from the robot, it 'locks onto' the box.
+	- locateBox(): robot is continuously re-locating the box and re-evaluating its location in relation to the box. (if the robot is moving to the left of center, it turns right to face the center)
+		- robot stops when it is barely not touching the box.
+
+Phase II
+	- pushRight/Left(): 
+		- turn until parallel to box
+		- move forward until datapoints just ahead of right/left datapoints 'open up'
+		- turn until front facing box
+		* turning done by picking a datapoint and turning until the distance of datapoint 'opens up' 
+
+Phase III
+	- Push until reached designated distance
+	- If Robot2 receives message that Robot1 stopped pushing, Robot1 will also stop and send message to HUB for advice on how to continue (saving the distance remaining for box to be pushed).
+
+
+
+
