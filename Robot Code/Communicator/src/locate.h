@@ -47,8 +47,6 @@ public:
     void turnRight(int dp);
     void adjustLeft(int dp);
     void adjustRight(int dp);
-    void turnAroundLeft();
-    void turnAroundRight();
 
     // push methods
     int pushBoxAlone(int n);

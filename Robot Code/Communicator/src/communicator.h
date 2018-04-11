@@ -31,6 +31,8 @@ public:
     void send_Move(int i);
     int getMove();
     void setMove(int m);
+
+    // for retrieval communication flags
     bool getStart();
     bool errorStart();
     bool getReady();

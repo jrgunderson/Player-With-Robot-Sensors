@@ -14,6 +14,8 @@
  * Task 4: - push
  *      a) if Robot1 stops
  *      b) Robot2 will also stop
+ *
+ * * Tasks 1-3 are in autonomous read-think-act loops
  */
 
 #include "args.h"
@@ -58,28 +60,29 @@ int Locate::run()
         robot->Read();
 
         // read Laser Ranger parameters
-        maxRange = lp->GetMaxRange();
-        scanPoints = lp->GetCount();
+        maxRange = lp->GetMaxRange(); // furthest distance laser can read
+        scanPoints = lp->GetCount(); // total datapoints on laser
         middle = scanPoints/2;
         int thirtyDegrees = scanPoints/8;
         right = thirtyDegrees; // -90 degrees from center
         left = scanPoints-1 - thirtyDegrees; // 90 degrees from center
         int fortyFiveDegrees = scanPoints/5.3;
-        rightEye = middle - fortyFiveDegrees;
+        rightEye = middle - fortyFiveDegrees; // 'eyes' used to narrow robot's vision
         leftEye = middle + fortyFiveDegrees;
 
         print(rightEye, " -> ", leftEye);
 
 
-        int index = -1; // index of laser where box is located
+        int index = -1; // index on laser where box is located
         double boxSize = scanPoints; // initialize box size to max
 
+        // second robot waits for first to tell it, it can start
         if(ID == 2){
             print("waiting for other robot");
-            wait2start();// second robot waits for first to tell it, it can start
+            wait2start();
         }
 
-
+        // TASK 1
         index = avoidWalls(); // move towards box while avoiding walls
         index = locateBox();  // move towards box after 'locking on'
 
@@ -97,20 +100,20 @@ int Locate::run()
 
 
 
-        // turn until datapoint reads shortest distance from box
+        // TASK 2: turn until datapoint reads shortest distance from box
         // this indicates robot is aligned front-facing
         if( index < middle )
         {
             adjustRight(middle);
         }
-        else{
-
+        else
+        {
             adjustLeft(middle);
         }
 
-
+        // TASKS 3 & 4
         if(ID == 1){ // robot1 move to the right side & push
-            success = pushRight(pushFor);
+            success = pushRight(pushFor); // in here Robot1 calls over Robot2
         }
         else{ // robot2 move to the left side & push
             success = pushLeft(pushFor);
@@ -270,7 +273,7 @@ void Locate::introduceError()
         pp->SetSpeed(-cap, 0.0);
     }
 
-    // 'shut-down' robot
+    // pseudo 'shut-down' robot
     wait(1);
     pp->SetMotorEnable(false);
 
@@ -399,7 +402,7 @@ bool Locate::goToRightSide()
 {
     // assuming robot front-facing box -> turn right 90 degrees
     turnRight(middle);
-    adjustRight(left);
+    adjustRight(left); // adjust until left datapoint perpendicular to box
 
     // tell other robot it can start
     if(ID == 1)
@@ -425,7 +428,7 @@ bool Locate::goToLeftSide()
 {
     // assuming robot front-facing box -> turn left 90 degrees
     turnLeft(middle);
-    adjustLeft(right);
+    adjustLeft(right); // adjust until right datapoint perpendicular to box
 
     // assuming robot's eyesight is parallel to box
     // move forward until "right eye" opens up
@@ -615,33 +618,6 @@ bool Locate::moveForwardFromLeft(int dp)
         }
     }// end for(;;)
     return 0;
-}
-
-
-// turn around 180 degrees -> Box on robot's Left side
-void Locate::turnAroundLeft()
-{
-    // assuming robot's eyesight is parallel to box -> turn right 90 degrees
-    turnLeft(left);
-    adjustLeft(middle);
-
-    // assuming robot front-facing box -> turn left 90 degrees
-    turnLeft(middle);
-    adjustLeft(right);
-
-}
-
-// turn around 180 degrees -> Box on robot's Right side
-void Locate::turnAroundRight()
-{
-    // assuming robot's eyesight is parallel to box -> turn right 90 degrees
-    turnRight(right);
-    adjustRight(middle);
-
-    // assuming robot front-facing box -> turn left 90 degrees
-    turnRight(middle);
-    adjustRight(left);
-
 }
 
 
@@ -1081,7 +1057,7 @@ int Locate::locateBox()
         pp->SetSpeed(speed, newturnrate);
 
 
-        // stop scanning once finite object a reached certain distance
+        // stop scanning once finite object reached certain distance
         if( minObjDist <= minDist )
         {
             print("I FOUND CENTER OF BOX!\n");
