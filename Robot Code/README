@@ -15,6 +15,11 @@
 	- Contains any method that would have anything to do with moving the robot
 	- This is the class that uses the 'driver' wrapper
 
+# Main.cpp
+	- Input IP addresses for the 3 computers
+	- Change the ID associated with the robots/hub (located in the “myID.txt” file inside the project)
+	- Trial variables (to introduce an error, iterations to push the box for)
+
 # runasrobot.cpp
 	- State machine for Robot1 & Robot2
 	- Sliding autonomy for Robot2 
